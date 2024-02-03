@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <dirent.h>
+#include <windows.h>
 // #include <dirent.h>
 // #include <unistd.h>
 // #include <stdbool.h>
@@ -8,7 +10,16 @@
 #include "commands.h"
 #include "global_functions.h"
 int main(int argc, char const *argv[]){
-    GlobalInit();
+
+    // chdir("D:\\testing project");
+    // char a[]="init";
+    // argc=2;
+    // argv[1]=a;
+
+
+    if (GlobalInit()){
+        return 1;
+    }
     if (argc<2){
         printf("khob alan man chi ro ejra konam barat? :|");
         return 1;
@@ -18,6 +29,6 @@ int main(int argc, char const *argv[]){
             return COMMAND_FUNCTIONS[i](argc-2,argv+2);
         }
     }
-    perror("chert voroodi dadi dadash");
+    printf("chert voroodi dadi dadash");
     return 1;
 }
