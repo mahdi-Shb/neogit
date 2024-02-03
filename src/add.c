@@ -6,67 +6,116 @@
 #include "global_functions.h"
 #include <sys/stat.h>
 #include <stdbool.h>
-void xcopy(char* path,char* filename){
+void xcopy(const char* path){
     char cmd[500];
-    char fullpath[_MAX_PATH];
-    GetFullPathNameA(path,_MAX_PATH,fullpath,NULL);
-    if (strncmp(fullpath,neogitpath,strlen(neogitpath)-strlen("\\.neogit"))){
-        printf("The path %s is not in the neogit initialized directory",fullpath);
+    char newpath[MAX_PATH];
+    getneogitpath(newpath,path,"\\stage");
+    deletefolder(newpath);
+    if (fileexist(newpath)){
+        printf("oh shit");
         return;
     }
-    sprintf(cmd,"xcopy %s %s\\stage%s\\%s /E /H /C /I",path,neogitpath,fullpath+strlen(neogitpath)-strlen(".neogit"),filename);
-    if (system(cmd)){
-        printf("Error occurred while adding the file %s",path);
-    } else {
-        printf("The file %s addded successfully",path);
-    }
+    sprintf(cmd,"xcopy \"%s\" \"%s\" /E /H /C /I",path,newpath);
+    system(cmd);
 }
-void copy(char* path,char* filename){
+void copy(const char* path){
     char cmd[500];
-    char fullpath[_MAX_PATH];
-    GetFullPathNameA(path,_MAX_PATH,fullpath,NULL);
-    if (strncmp(fullpath,neogitpath,strlen(neogitpath)-strlen("\\.neogit"))){
-        printf("The path %s is not in the neogit initialized directory",fullpath);
+    char newpath[MAX_PATH];
+    getneogitpath(newpath,path,"\\stage");
+    if (remove(newpath)){
+        printf("Failed to remove %s\n",newpath);
         return;
     }
-    sprintf(cmd,"copy %s %s\\stage%s\\%s",path,neogitpath,fullpath+strlen(neogitpath)-strlen(".neogit"),filename);
-    if (system(cmd)){
-        printf("Error occurred while adding the file %s",path);
-    } else {
-        printf("The file %s addded successfully",path);
+    if (fileexist(newpath)){
+        printf("ooooh shit");
+        return;
     }
+    sprintf(cmd,"copy \"%s\" \"%s\"",path,newpath);
+    system(cmd);
+}
+void Copy(char* path){
+    struct stat st;
+    if (stat(path,&st)==0){   
+        if (S_ISDIR(st.st_mode)) {
+            xcopy(path);
+        } else {
+            copy(path);
+        }
+    } else {
+        char Path[MAX_PATH];
+        getneogitpath(Path,path,"\\stage");
+        deletefolder(Path);
+    }
+    
+}
+void add_path(char* path){
+    Copy(path);
+    // char* lpath=path+strlen(path);
+    //     DIR *d = opendir(path);
+    //     struct dirent *entry;
+    //     readdir(d);
+    //     readdir(d);
+    //     while ((entry = readdir(d))) {
+    //         strcat(path,entry->d_name);
+    //         add_path(path);
+    //     }
+    //     *lpath='\0';
+    // } else {
+    //     if (IsStage(path)){
+    //         printf("%s has already added",path);
+    //     } else {
+
+    //         fprintf(stagefile,"%s\n",path);
+    //         printf("%s added successfully",path);
+    //     }
+    // }
 }
 void addone(const char* PATH){
-    char path[strlen(PATH)+1];
-    strcpy(path,PATH);
+    char path[_MAX_PATH];
+    GetFullPathNameA(PATH,_MAX_PATH,path,NULL);
     struct stat st;
     struct dirent* entry;
-    char Path[_MAX_PATH];
-    GetFullPathNameA(path,_MAX_PATH,Path,NULL);
-    if (strncmp(Path,neogitpath,strlen(neogitpath)-strlen("\\.neogit"))){
+    if (strncmp(path,neogitpath,strlen(neogitpath)-strlen("\\.neogit"))){
         printf("The path %s is not in the neogit initialized directory",path);
         return;
     }
+
+    if (!strncmp(path,neogitpath,strlen(path))){
+        strcat(path,".\\*");
+        addone(path);
+        return;
+    }
+    char Path[_MAX_PATH];
+    strcpy(Path,path);
     char *wcname=get_file(Path);
     DIR *dir = opendir(Path);
+    readdir(dir);
+    readdir(dir);
+    int n=0;
     while ((entry=readdir(dir))!=NULL){
         if (match_wildcard(wcname,entry->d_name) && strcmp(entry->d_name,".neogit")){
             char p[MAX_PATH];
-            sprintf(p,"%s\\%s",Path,entry->d_name);
-            if (IsStage(p)){
-                printf("%s has already added",p);
-            } else {
-                fprintf(stagefile,"%s\n",p);
-                printf("%s added successfully",p);
-            }  
-            oee;
-            // stat(entry->d_name, &st);
-            // if (S_ISDIR(st.st_mode)) {
-            //     xcopy(path,entry->d_name);
-            // } else {
-            //     copy(path,entry->d_name);
-            // }
+            sprintf(p,"%s%s",Path,entry->d_name);
+            add_path(p);
+            n++;
         }
+    }
+    getneogitpath(Path,path,"\\stage");
+    wcname=get_file(Path);
+    dir = opendir(Path);
+    readdir(dir);
+    readdir(dir);
+    while ((entry=readdir(dir))!=NULL){
+        if (match_wildcard(wcname,entry->d_name) && strcmp(entry->d_name,".neogit")){
+            char p[MAX_PATH];
+            sprintf(p,"%s%s",Path,entry->d_name);
+            getnotneogitpath(p,p,"\\stage");
+            add_path(p);
+            n++;
+        }
+    }
+    if (!n){
+        printf("There is no matching file or directory with the path %s",PATH);
     }
 }
 void writeone(int I,struct dirent* entry,char* path,char* lpath,HANDLE hConsole) {
@@ -75,11 +124,11 @@ void writeone(int I,struct dirent* entry,char* path,char* lpath,HANDLE hConsole)
     stat(path,&st);
     boolean Exists=IsStage(path);
     
-    if (S_ISDIR(st.st_mode)){
-        SetConsoleTextAttribute(hConsole,Exists ? FOLDER_COLOR|FOREGROUND_INTENSITY : FOLDER_COLOR);
-    } else{
-        SetConsoleTextAttribute(hConsole,Exists ? FILE_COLOR|FOREGROUND_INTENSITY : FILE_COLOR);
-    }
+    // if (S_ISDIR(st.st_mode)){
+    //     SetConsoleTextAttribute(hConsole,Exists ? FOLDER_COLOR|FOREGROUND_INTENSITY : FOLDER_COLOR);
+    // } else{
+    //     SetConsoleTextAttribute(hConsole,Exists ? FILE_COLOR|FOREGROUND_INTENSITY : FILE_COLOR);
+    // }
     for (int i = 0; i <I*4; i++){
         printf(" ");
     }

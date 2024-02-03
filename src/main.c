@@ -9,13 +9,13 @@
 #include "header.h"
 #include "commands.h"
 #include "global_functions.h"
-int main(int argc, char const *argv[]){
+int main(int argc, char const *argvv[]){
 
-    // chdir("D:\\testing project");
-    // char a[]="init";
-    // argc=2;
-    // argv[1]=a;
-
+    chdir("D:\\testing project");
+    char a[]="add";
+    char b[]=".";
+    argc=3;
+    char const *argv[]={argvv[0],a,b};
 
     if (GlobalInit()){
         return 1;

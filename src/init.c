@@ -22,10 +22,17 @@ int Cinit(int argc,const char* argv[]){
     success=success && !mkdir(".\\.neogit\\configs");
     success=success && !mkdir(".\\.neogit\\commits");
     success=success && !mkdir(".\\.neogit\\commits\\specs");
+    success=success && !mkdir(".\\.neogit\\stage");
     file=fopen(".\\.neogit\\configs\\alias","w");
     success=success && file;
-    file=fopen(".\\.neogit\\stage","w");
+    file=fopen(".\\.neogit\\commits\\specs\\numberofcommits","w");
     success=success && file;
+    if (file){
+        fprintf(file,"0");
+    }
+    //file=fopen(".\\.neogit\\stage","w");
+    //success=success && file;
+    
     file=fopen(".\\.neogit\\configs\\user","w");
     success=success && file;
     if (!success){

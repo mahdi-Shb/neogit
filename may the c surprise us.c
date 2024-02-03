@@ -2,7 +2,20 @@
 // #include "header.h"
 #include <dirent.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+#include "commands.h"
+#include "constant.h"
+#include "global_functions.h"
+#include <sys/stat.h>
+#include <stdbool.h>
+
 int main(int argc, char const *argv[]){
+    char p[_MAX_PATH];
+    GetFullPathNameA("./**",MAX_PATH,p,NULL);
+    printf("%s",p);
     struct dirent* entry;
     DIR *dir = opendir(".");
     entry = readdir(dir);

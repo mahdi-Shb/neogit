@@ -9,18 +9,19 @@
 #include "commands.h"
 #include <stdlib.h>
 #include <time.h>
+#include "constant.h"
 const char *COMMAND_NAMES[NUMBER_OF_COMMANDS]={"config","init","reset","undo","status","commit","set","replace","remove","add"};
 int (*COMMAND_FUNCTIONS[NUMBER_OF_COMMANDS])(int argc,const char* argv[]) ={Cconfig,Cinit,Creset,Cundo,Cstatus,Ccommit,Cset,Creplace,Cremove,Cadd};
 char* neogitpath=NULL;
 FILE* stagefile=NULL;
+int numberofcommits;
 char defaultgmail[100]="...@gmail.com";
 char defaultname[100]="...";
-char* get_random_ID(){
-    srand(time(0));
-    int a=rand();
-    char *res=(char*)malloc(sizeof(int)+1);
-    sprintf(res,"%X",a);
-    return res;
+void get_ID(char *ID){
+    // srand(time(0));
+    // int a=rand();
+    int id=numberofcommits;
+    sprintf(ID,"%d",id);
 }
 char **Readlines(FILE* file){
     char **result=calloc(128,sizeof(void*));
@@ -60,12 +61,16 @@ int GlobalInit(){
     FindNeoGitDir();
     if (neogitpath){
         char A[MAX_PATH];
-        sprintf(A,"%s\\stage",neogitpath);
-        stagefile=fopen(A,"r+");
-        if (stagefile==NULL){
-            printf("Can't open stage file");
+        sprintf(A,"%s\\commits\\specs\\numberofcommits",neogitpath);
+        FILE* file=fopen(A,"r");
+        if (file){
+            fscanf(file,"%d",&numberofcommits);
+            fclose(file);
+        } else {
+            printf("Can't open numberofcommits file");
             return 1;
         }
+        
     }
     return 0;
 }
@@ -116,22 +121,119 @@ boolean match_wildcard(const char* WCName,const char* name){
 char *get_file(char *path){
     for (char *result=path+strlen(path)-1; result>=path;result--){
         if (*result=='\\'){
-            *result='\0';
-            return result+1;
+            memmove(result+2,result+1,strlen(result+1)+1);
+            *(result+1)='\0';            
+            return result+2;
         }
     }
     return path;
 }
-boolean exists(char *path){
-    fseek(stagefile, 0, SEEK_SET);
+boolean fileexist(const char*path){
+    struct stat fileStat;
+    return (stat(path, &fileStat) == 0);
+}
+// boolean commitexists(char *path){
+//     fseek(stagefile, 0, SEEK_SET);
+//     char Path[MAX_PATH];
+//     while (fgets(Path,_MAX_PATH,stagefile)){
+//         if (!strncmp(path,Path,strlen(Path)-1) && strlen(Path)-1){
+//             return true;
+//         }
+//     }
+//     return false;
+// }
+boolean IsStage(const char *path){
+    // return exists(path);
+    char newpath[MAX_PATH];
+    getneogitpath(newpath,path,"\\stage");
+    return fileexist(newpath);
+}
+FILE* get_commit_file(char *path){
     char Path[MAX_PATH];
-    while (fgets(Path,_MAX_PATH,stagefile)){
-        if (!strncmp(path,Path,strlen(Path)-1) && strlen(Path)-1){
-            return true;
+    FILE* file=NULL;
+    for (int i=numberofcommits-1; i>=0; i--){
+        // sprintf(Path,"%s\\commits\\%d\\%s",neogitpath,i,path+strlen(neogitpath)-strlen(".neogit"));
+        char subneogitpath[20];
+        sprintf(subneogitpath,"\\commits\\%d",i);
+        getneogitpath(Path,path,subneogitpath);
+        if ((file=fopen(Path,"rb"))){
+            return file;
+        }
+        strcat(Path,".delneogit");
+        if ((file=fopen(Path,"rb"))){
+            return NULL;
         }
     }
-    return false;
+    return NULL;
 }
-boolean IsStage(char *path){
-    return exists(path);
+boolean fsame(FILE* f1, FILE* f2){
+    int s1,s2;
+    fseek(f1,0,SEEK_END);
+    s1=ftell(f1);
+    fseek(f1,0,SEEK_SET);
+    fseek(f2,0,SEEK_END);
+    s2=ftell(f2);
+    fseek(f2,0,SEEK_SET);
+    if (s1!=s2) {
+        return false;
+    }
+    char str1[s1+1],str2[s1+1];
+    fread(str1,1,s1+1,f1);
+    fread(str2,1,s1+1,f2);
+    return !strcmp(str1,str2);
+}
+boolean psame(char* path1, char* path2){
+    FILE* f1 = fopen(path1,"r");
+    FILE* f2 = fopen(path2,"r");
+    return fsame(f1,f2);
+}
+void getneogitpath(char* newpath,const char* path,const char* neogitsubpath){
+    sprintf(newpath,"%s%s%s",neogitpath,neogitsubpath,path+strlen(neogitpath)-strlen("\\.neogit"));
+}
+void getnotneogitpath(char* newpath,const char* path,const char* neogitsubpath){//neogitsubpath: \commit\123456789
+    strcpy(newpath,path);
+    memmove(newpath+strlen(neogitpath)-strlen("\\.neogit"),newpath+strlen(neogitpath)+strlen(neogitsubpath),1+strlen(newpath+strlen(neogitpath)+strlen(neogitsubpath)));
+}
+char getY(char *path){
+    FILE* commitFile=get_commit_file(path);
+    FILE* file=fopen(path,"rb");
+    if(!commitFile){
+        return 'A';
+    }
+    if (!file){
+        return 'D';
+    }
+    if (!fsame(file,commitFile)){
+        return 'M';
+    } else {
+        return '\0';
+    }
+}
+void deletefolder(char* path){
+    struct stat st;
+    stat(path,&st);
+    if (!S_ISDIR(st.st_mode)){
+        remove(path);
+        return;
+    }
+    char *lpath=path+strlen(path);
+    DIR *dir=opendir(path);
+    struct dirent *entry;
+    readdir(dir);
+    readdir(dir);
+    while (entry=readdir(dir)){
+        sprintf(lpath,"\\%s",entry->d_name);
+        deletefolder(path);
+        *lpath='\0';
+    }
+    rmdir(path);
+    // SHFILEOPSTRUCT fileOp;
+    // ZeroMemory(&fileOp, sizeof(SHFILEOPSTRUCT));
+    // fileOp.hwnd = NULL;
+    // fileOp.wFunc = FO_DELETE;
+    // fileOp.pFrom = path;
+    // fileOp.pTo = NULL;
+    // fileOp.fFlags = FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI;
+
+    // SHFileOperation(&fileOp);
 }

@@ -4,7 +4,6 @@
 int Cadd(int argc,const char* argv[]);
 int Cconfig(int argc,const char* argv[]);
 int Cinit(int argc,const char* argv[]);
-int Crest(int argc,const char* argv[]);
 int Creset(int argc,const char* argv[]);
 int Cundo(int argc,const char* argv[]);
 int Cstatus(int argc,const char* argv[]);
