@@ -6,6 +6,14 @@
 #include "global_functions.h"
 #include <sys/stat.h>
 #include <stdbool.h>
+// void find_deletes(const char* path){
+//     static Path;
+//     if (path!=NULL){
+//         strcpy(Path,path);
+
+//     }
+
+// }
 void xcopy(const char* path){
     char cmd[500];
     char newpath[MAX_PATH];
@@ -49,7 +57,10 @@ void Copy(char* path){
     
 }
 void add_path(char* path){
-    Copy(path);
+    char Path[MAX_PATH];
+    getneogitpath(Path,path,"\\stage");
+    // sprintf(Path+strlen(Path),"%d",numberofstages);
+    ncopyfolder(path,Path);
     // char* lpath=path+strlen(path);
     //     DIR *d = opendir(path);
     //     struct dirent *entry;
@@ -86,21 +97,41 @@ void addone(const char* PATH){
         return;
     }
     char Path[_MAX_PATH];
-    strcpy(Path,path);
-    char *wcname=get_file(Path);
-    DIR *dir = opendir(Path);
-    readdir(dir);
-    readdir(dir);
     int n=0;
-    while ((entry=readdir(dir))!=NULL){
-        if (match_wildcard(wcname,entry->d_name) && strcmp(entry->d_name,".neogit")){
-            char p[MAX_PATH];
-            sprintf(p,"%s%s",Path,entry->d_name);
-            add_path(p);
-            n++;
-        }
-    }
-    getneogitpath(Path,path,"\\stage");
+    DIR *dir;
+    char *wcname;
+
+    // getneogitpath(Path,path,"\\stage");
+    // wcname=get_file(Path);
+    // dir = opendir(Path);
+    // readdir(dir);
+    // readdir(dir);
+    // while ((entry=readdir(dir))!=NULL){
+    //     if (match_wildcard(wcname,entry->d_name) && strcmp(entry->d_name,".neogit")){
+    //         char p[MAX_PATH];
+    //         sprintf(p,"%s%s",Path,entry->d_name);
+    //         getnotneogitpath(p,p,"\\stage");
+    //         add_path(p);
+    //         n++;
+    //     }
+    // }
+
+    // getneogitpath(Path,path,"\\lastcommit");
+    // wcname=get_file(Path);
+    // dir = opendir(Path);
+    // readdir(dir);
+    // readdir(dir);
+    // while ((entry=readdir(dir))!=NULL){
+    //     if (match_wildcard(wcname,entry->d_name) && strcmp(entry->d_name,".neogit")){
+    //         char p[MAX_PATH];
+    //         sprintf(p,"%s%s",Path,entry->d_name);
+    //         getnotneogitpath(p,p,"\\lastcommit");
+    //         add_path(p);
+    //         n++;
+    //     }
+    // }
+
+    strcpy(Path,path);
     wcname=get_file(Path);
     dir = opendir(Path);
     readdir(dir);
@@ -109,11 +140,11 @@ void addone(const char* PATH){
         if (match_wildcard(wcname,entry->d_name) && strcmp(entry->d_name,".neogit")){
             char p[MAX_PATH];
             sprintf(p,"%s%s",Path,entry->d_name);
-            getnotneogitpath(p,p,"\\stage");
             add_path(p);
             n++;
         }
     }
+    
     if (!n){
         printf("There is no matching file or directory with the path %s",PATH);
     }

@@ -17,6 +17,7 @@ FILE* stagefile=NULL;
 int numberofcommits;
 char defaultgmail[100]="...@gmail.com";
 char defaultname[100]="...";
+
 void get_ID(char *ID){
     // srand(time(0));
     // int a=rand();
@@ -148,24 +149,7 @@ boolean IsStage(const char *path){
     getneogitpath(newpath,path,"\\stage");
     return fileexist(newpath);
 }
-FILE* get_commit_file(char *path){
-    char Path[MAX_PATH];
-    FILE* file=NULL;
-    for (int i=numberofcommits-1; i>=0; i--){
-        // sprintf(Path,"%s\\commits\\%d\\%s",neogitpath,i,path+strlen(neogitpath)-strlen(".neogit"));
-        char subneogitpath[20];
-        sprintf(subneogitpath,"\\commits\\%d",i);
-        getneogitpath(Path,path,subneogitpath);
-        if ((file=fopen(Path,"rb"))){
-            return file;
-        }
-        strcat(Path,".delneogit");
-        if ((file=fopen(Path,"rb"))){
-            return NULL;
-        }
-    }
-    return NULL;
-}
+
 boolean fsame(FILE* f1, FILE* f2){
     int s1,s2;
     fseek(f1,0,SEEK_END);
@@ -194,8 +178,11 @@ void getnotneogitpath(char* newpath,const char* path,const char* neogitsubpath){
     strcpy(newpath,path);
     memmove(newpath+strlen(neogitpath)-strlen("\\.neogit"),newpath+strlen(neogitpath)+strlen(neogitsubpath),1+strlen(newpath+strlen(neogitpath)+strlen(neogitsubpath)));
 }
-char getY(char *path){
-    FILE* commitFile=get_commit_file(path);
+char getY(char *path,char* subneogitpath){
+    char Path[MAX_PATH];
+    //find_commit_file(path)
+    getneogitpath(Path,path,subneogitpath);
+    FILE* commitFile=fopen(Path,"rb");
     FILE* file=fopen(path,"rb");
     if(!commitFile){
         return 'A';
@@ -209,31 +196,14 @@ char getY(char *path){
         return '\0';
     }
 }
-void deletefolder(char* path){
-    struct stat st;
-    stat(path,&st);
-    if (!S_ISDIR(st.st_mode)){
-        remove(path);
-        return;
+void fnprintf(FILE* file,const char* s,int d){
+    fprintf(file,"%s",s);
+    int j=strlen(s);
+    char a='\0';
+    while(d-- > j){
+        fputc('\0',file);
+        // fwrite(&a,1,1,file);
+        // fprintf(file,"%c",'\0');
+        // fputc('\0',file);
     }
-    char *lpath=path+strlen(path);
-    DIR *dir=opendir(path);
-    struct dirent *entry;
-    readdir(dir);
-    readdir(dir);
-    while (entry=readdir(dir)){
-        sprintf(lpath,"\\%s",entry->d_name);
-        deletefolder(path);
-        *lpath='\0';
-    }
-    rmdir(path);
-    // SHFILEOPSTRUCT fileOp;
-    // ZeroMemory(&fileOp, sizeof(SHFILEOPSTRUCT));
-    // fileOp.hwnd = NULL;
-    // fileOp.wFunc = FO_DELETE;
-    // fileOp.pFrom = path;
-    // fileOp.pTo = NULL;
-    // fileOp.fFlags = FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI;
-
-    // SHFileOperation(&fileOp);
 }

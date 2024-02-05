@@ -8,12 +8,3 @@
 int Cundo(int argc,const char* argv[]){
 
 }
-int Cset(int argc,const char* argv[]){
-
-}
-int Creplace(int argc,const char* argv[]){
-
-}
-int Cremove(int argc,const char* argv[]){
-
-}

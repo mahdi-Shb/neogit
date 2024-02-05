@@ -20,15 +20,30 @@ int Cinit(int argc,const char* argv[]){
     //making files and dirs inside neogit:
     FILE* file;
     success=success && !mkdir(".\\.neogit\\configs");
+    success=success && !mkdir(".\\.neogit\\lastcommit");
     success=success && !mkdir(".\\.neogit\\commits");
     success=success && !mkdir(".\\.neogit\\commits\\specs");
     success=success && !mkdir(".\\.neogit\\stage");
+    success=success && !mkdir(".\\.neogit\\laststage");
+    
+    file=fopen(".\\.neogit\\shortcuts","w");
+    success=success && file;
+    if (file){
+        fprintf(file,"%99s\n",DELETE_SHORTCUT);
+        fclose(file);
+    }
+    
     file=fopen(".\\.neogit\\configs\\alias","w");
     success=success && file;
+    if (file){
+        fclose(file);
+    }
+    
     file=fopen(".\\.neogit\\commits\\specs\\numberofcommits","w");
     success=success && file;
     if (file){
         fprintf(file,"0");
+        fclose(file);
     }
     //file=fopen(".\\.neogit\\stage","w");
     //success=success && file;
