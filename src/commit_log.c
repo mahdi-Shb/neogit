@@ -19,8 +19,10 @@ void initcommitdata(struct Commitdata* commitdata,char *msg){
     sprintf(path,"%s\\lastcommit\\commitdata",neogitpath);
     file =fopen(path,"r");
     if (file){
-        fscanf(file,"%s",commitdata->previous_id);
-        fscanf(file,"%s",commitdata->branch);
+        struct Commitdata cd;
+        fread(&cd,sizeof(cd),1,file);
+        strcpy(commitdata->previous_id,cd.previous_id);
+        strcpy(commitdata->branch,cd.branch);
         fclose(file);
     } else{
         *commitdata->previous_id='\0';
@@ -108,10 +110,9 @@ int Ccommit(int argc,const char* argv[]){
         printf("error creating commit");
         return 1;
     }
-    commitdata.fileschanged=ocopyfolder(path,Path);
+    commitdata.fileschanged=normalcopyfolder(path,Path);
+
     // lastcommit and laststage
-    sprintf(path,"%s\\lastcommit",neogitpath);
-    ocopyfolder(Path,path);
     sprintf(path,"%s\\laststage",neogitpath);
     deleteinsidefolder(path);
     sprintf(path,"%s\\stage",neogitpath);
@@ -125,6 +126,10 @@ int Ccommit(int argc,const char* argv[]){
     }
     fwrite(&commitdata,sizeof(struct Commitdata),1,file);
     fclose(file);
+
+    Path[strlen(Path)-strlen("\\commitdata")]='\0';
+    sprintf(path,"%s\\lastcommit",neogitpath);
+    ocopyfolder(Path,path);
     sprintf(Path,"%s\\commitdatas",neogitpath);
     file=fopen(Path,"ab");
     if (!file){

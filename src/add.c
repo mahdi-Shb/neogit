@@ -29,7 +29,7 @@ void addone(const char* PATH,boolean a){
     }
 
     if (!strncmp(path,neogitpath,strlen(path))){
-        strcat(path,".\\*");
+        strcat(path,"\\*");
         addone(path,a);
         return;
     }
@@ -117,11 +117,11 @@ void undo(){
     sprintf(path1,"%s\\stage",neogitpath);
     sprintf(path2,"%s\\laststage",neogitpath);
     sprintf(pathtemp,"%s\\temp",neogitpath);
-    ocopyfolder(path1,pathtemp);
+    normalcopyfolder(path1,pathtemp);
     deleteinsidefolder(path1);
-    ocopyfolder(path2,path1);
+    normalcopyfolder(path2,path1);
     deleteinsidefolder(path2);
-    ocopyfolder(pathtemp,path2);
+    normalcopyfolder(pathtemp,path2);
     deletefolder(pathtemp);
 }
 int Cadd(int argc,const char* argv[]){
@@ -139,7 +139,7 @@ int Cadd(int argc,const char* argv[]){
         deleteinsidefolder(path);
         char Path[MAX_PATH];
         sprintf(Path,"%s\\stage",neogitpath);
-        ocopyfolder(Path,path);
+        normalcopyfolder(Path,path);
 
         for (int i=1;i<argc;i++){
             addone(argv[i],true);
@@ -170,7 +170,7 @@ int Cadd(int argc,const char* argv[]){
         deleteinsidefolder(path);
         char Path[MAX_PATH];
         sprintf(Path,"%s\\stage",neogitpath);
-        ocopyfolder(Path,path);
+        normalcopyfolder(Path,path);
 
         addone(argv[0],true);
         if (argc>1){
@@ -194,7 +194,7 @@ int Creset(int argc,const char* argv[]){
         deleteinsidefolder(path);
         char Path[MAX_PATH];
         sprintf(Path,"%s\\stage",neogitpath);
-        ocopyfolder(Path,path);
+        normalcopyfolder(Path,path);
 
         for (int i=1;i<argc;i++){
             addone(argv[i],false);
@@ -212,7 +212,7 @@ int Creset(int argc,const char* argv[]){
         deleteinsidefolder(path);
         char Path[MAX_PATH];
         sprintf(Path,"%s\\stage",neogitpath);
-        ocopyfolder(Path,path);
+        normalcopyfolder(Path,path);
 
         addone(argv[0],false);
         if (argc>1){

@@ -17,6 +17,7 @@ struct Shmsg{
 struct Alicmd{
     char ali[100],cmd[250];
 };
+extern char DELETE_TEXT[];
 extern char *neogitpath;
 extern FILE *stagefile; 
 extern char defaultgmail[100],defaultname[100];
@@ -42,6 +43,7 @@ void revert_files(char *newpath,char* lastcommitid);
 // int copy_commit_files(char *newpath,char *path,char *subneogitcommitpath,int I);
 int ocopyfile(char*path,char*newpath);
 int ocopyfolder(char*path,char*newpath);
+int normalcopyfolder(char*path,char*newpath);
 boolean ncopyfile(char*path,char*newpath,char*checkpath);
 boolean ncopyfolder(char*path,char*newpath,char*checkpath);
 boolean isempty(char*path);

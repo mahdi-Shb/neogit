@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "constant.h"
+char DELETE_TEXT[]=", m4tm3,gm34jkl3cjp34090groi`39`9rfhoiur=+`48484309googoolimagoolivui";
 //overwrite copy file
 //used for commits
 void copyfile(char*path,char*newpath){
@@ -84,7 +85,9 @@ boolean isdeletefile(char*path){
     if (!f) return false;
     char dt[sizeof(DELETE_TEXT)];
     fread(dt,sizeof(DELETE_TEXT),1,f);
-    boolean idf = feof(f) && !strcmp(dt,DELETE_TEXT);
+    char aa;
+    boolean idf = !fread(&aa,1,1,f) && !strcmp(dt,DELETE_TEXT);
+    printf("%d %d %d\n",idf,!strcmp(dt,DELETE_TEXT),feof(f));
     fclose(f);
     return idf;
 }
@@ -185,10 +188,43 @@ void deleteinsidefolder(char* path){
     }
     closedir(dir);
 }
-
+int normalcopyfolder(char*path,char*newpath){
+    if (!strcmp(newpath,neogitpath)||!strcmp(path,neogitpath)){
+        return 0; 
+    }
+    struct stat st;
+    stat(path,&st);
+    if (!S_ISDIR(st.st_mode)){
+        copyfile(path,newpath);
+        return 1;
+    }
+    if (!fileexist(newpath)){
+        if (mkdir(newpath)){
+            printf("normalcopy: Couldn't create directory,%s\n",newpath);
+        }
+    }
+    char *lpath=path+strlen(path);
+    char *lnewpath=newpath+strlen(newpath);
+    DIR *dir=opendir(path);
+    struct dirent *entry;
+    readdir(dir);
+    readdir(dir);
+    int fch=0;
+    while (entry=readdir(dir)){
+        sprintf(lpath,"\\%s",entry->d_name);
+        sprintf(lnewpath,"\\%s",entry->d_name);
+        fch+=normalcopyfolder(path,newpath);
+        *lpath='\0';
+        *lnewpath='\0';
+    }
+    closedir(dir);
+    return fch;
+}
 boolean isempty(char*path){
     DIR *dir=opendir(path);
     readdir(dir);
     readdir(dir);
-    return !readdir(dir);
+    boolean flag=!readdir(dir);
+    closedir(dir);
+    return flag;
 }
