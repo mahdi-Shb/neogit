@@ -33,10 +33,8 @@ int ocopyfile(char*path,char*newpath){
         return 0;
     }
     remove(newpath);
-    printf("h");
     
     if (!isdeletefile(path)){
-        printf("|%s|",path);
         copyfile(path,newpath);
     }
     return 1;
@@ -92,6 +90,7 @@ boolean isdeletefile(char*path){
     return idf;
 }
 boolean ncopyfile(char*path,char*newpath,char*checkpath){
+    printf("ara");
     if (fileexist(path)){
         if (fileexist(newpath)){ // inja gofte boodin age vojood dashte copy nakone
             return false;

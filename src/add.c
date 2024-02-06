@@ -43,14 +43,12 @@ void addone(const char* PATH,boolean a){
     char stagepath[MAX_PATH],lcommitpath[MAX_PATH];
     getneogitpath(stagepath,Path,"\\stage");
     getneogitpath(lcommitpath,Path,"\\lastcommit");
-    //printf("%s %s %s",Path,stage)
-    readdirs(3,Path,stagepath,lcommitpath);
-    // dir = opendir(Path);
-    // readdir(dir);
-    // readdir(dir);
+    
+    struct DIRs* dirs;
+    opendirs(&dirs,Path,stagepath,lcommitpath,NULL);
     char*d_name;
-    while (d_name=readdirs(0)){
-        if (match_wildcard(wcname,d_name) && strcmp(d_name,".neogit")){
+    while (d_name=readdirs(dirs)){
+        if (match_wildcard(wcname,d_name) && strcmp(d_name,".neogit") && strcmp(d_name,"commitdata")){
             char p[MAX_PATH];
             sprintf(p,"%s%s",Path,d_name);
             if (a){
@@ -61,7 +59,7 @@ void addone(const char* PATH,boolean a){
             n++;
         }
     }
-    // closedir(dir);
+    closedirs(dirs);
     if (!n){
         printf("There is no matching file or directory with the path %s",PATH);
     }

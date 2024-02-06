@@ -6,8 +6,8 @@
 #include "global_functions.h"
 #include <sys/stat.h>
 #include <stdbool.h>
-void swriteone(int I,struct dirent* entry,char* path,char* lpath,HANDLE hConsole) {
-    sprintf(lpath,"\\%s",entry->d_name);
+void swriteone(int I,char* d_name,char* path,char* lpath,HANDLE hConsole) {
+    // sprintf(lpath,"\\%s",d_name);
     struct stat st;
     stat(path,&st);
     if (!S_ISDIR(st.st_mode)){
@@ -16,7 +16,7 @@ void swriteone(int I,struct dirent* entry,char* path,char* lpath,HANDLE hConsole
             for (int i = 0; i <I*4; i++){
                 printf(" ");
             }
-            printf("%s",entry->d_name);
+            printf("%s",d_name);
             printf(" %c",IsStage(path) ? '+' : '-');
             printf("%c\n",Y);
         }
@@ -24,22 +24,35 @@ void swriteone(int I,struct dirent* entry,char* path,char* lpath,HANDLE hConsole
         for (int i = 0; i <I*4; i++){
             printf(" ");
         }
-        printf("%s\\\n",entry->d_name);
+        printf("%s\\\n",d_name);
     }
 }
 void sWrite(int I, char* path, char* lpath, HANDLE hConsole){
-    DIR *dir = opendir(path);
-    struct dirent* entry;
-    readdir(dir);
-    readdir(dir);
-    while ((entry=readdir(dir))){
-        if (strcmp(entry->d_name,".neogit")){
-            swriteone(I,entry,path,lpath,hConsole);
+    // DIR *dir = opendir(path);
+    // struct dirent* entry;
+    // readdir(dir);
+    // readdir(dir);
+    struct stat st;
+    stat(path,&st);
+    if (!S_ISDIR(st.st_mode)){
+        return;
+    }
+    char stagepath[MAX_PATH],lcommitpath[MAX_PATH];
+    getneogitpath(stagepath,path,"\\stage");
+    getneogitpath(lcommitpath,path,"\\lastcommit");
+    
+    struct DIRs* dirs;
+    opendirs(&dirs,path,stagepath,lcommitpath,NULL);
+    char*d_name;
+    while (d_name=readdirs(dirs)){
+        if (strcmp(d_name,".neogit")&&strcmp(d_name,"commitdata")){
+            sprintf(lpath,"\\%s",d_name);
+            swriteone(I,d_name,path,lpath,hConsole);
             sWrite(I+1,path,lpath+strlen(lpath),hConsole);
             *lpath='\0';
         }
     }
-    closedir(dir);
+    closedirs(dirs);
 }
 void sWWrite(){
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);

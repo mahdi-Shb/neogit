@@ -1,9 +1,27 @@
 #ifndef _GLOBAL_FUNCIONS_H_
 #define _GLOBAL_FUNCTIONS_H_
-#define name(...) readdirs(0, __VA_ARGS__, (char *)NULL)
-#include <dirent.h>
-#include <time.h>
+// #define name(...) readdirs(0, __VA_ARGS__, (char *)NULL)
 #include <constant.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <Windows.h>
+#include <stdio.h>
+#include <wchar.h>
+#include <stdbool.h>
+#include "commands.h"
+#include <stdlib.h>
+#include <time.h>
+#include "constant.h"
+
+#define READDIRS_MAX_DIRS 4
+struct DIRs {
+    DIR *dirs[READDIRS_MAX_DIRS];
+    char *d_names[256];
+    int I;
+};
 struct Commitdata{
     // char committype;//c:commit //s:stage //u:unstage
     char id[ID_LEN+1],branch[100];
@@ -24,6 +42,7 @@ extern char defaultgmail[100],defaultname[100];
 extern int numberofcommits;
 void FindNeoGitDir();
 char **readlines(FILE* file);
+int Find_Str(char** Strs,char* str,size_t StrsLen);
 boolean fileexist(const char*path);
 boolean IsStage(const char *path);
 boolean match_wildcard(const char* WCName,const char* name);
@@ -51,6 +70,8 @@ void deletefolder(char* path);
 void deleteinsidefolder(char* path);
 void makedeletefile(char*path);
 boolean isdeletefile(char*path);
-
-char* readdirs(int count,...);
+char* readdirs(struct DIRs* dirs);
+void closedirs(struct DIRs* dirs);
+void opendirs(struct DIRs** dirs, ...);
+int printbranchs();
 #endif

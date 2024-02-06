@@ -7,138 +7,7 @@
 #include <sys/stat.h>
 #include <stdbool.h>
 #include <time.h>
-void printcommitdata(struct Commitdata* cd);
-void initcommitdata(struct Commitdata* commitdata,char *msg){
-    get_ID(commitdata->id);
-    strcpy(commitdata->msg,msg);
-    char path[_MAX_PATH];
-    sprintf(path,"%s\\configs\\user",neogitpath);
-    FILE*file =fopen(path,"r");
-    fscanf(file,"%s",commitdata->username);
-    fclose(file);
-    sprintf(path,"%s\\lastcommit\\commitdata",neogitpath);
-    file =fopen(path,"r");
-    if (file){
-        struct Commitdata cd;
-        fread(&cd,sizeof(cd),1,file);
-        strcpy(commitdata->previous_id,cd.previous_id);
-        strcpy(commitdata->branch,cd.branch);
-        fclose(file);
-    } else{
-        *commitdata->previous_id='\0';
-        strcpy(commitdata->branch,DEFAULT_BRANCH);
-    }
-    commitdata->T=time(NULL);
-}
-// boolean find_commit_file(char *findpath,const char* subneogitpath,const char* path, int i){
-//     while (i--){
-//         char Subneogitpath[100];
-//         sprintf(Subneogitpath,"%s\\%d",subneogitpath,i);
-//         getneogitpath(findpath,path,Subneogitpath);
-//         if (fileexist(findpath)){
-//             return true;
-//         }
-//         strcat(findpath,".delneogit");
-//         if (fileexist(findpath)){
-//             return false;
-//         }
-//     }
-//     return false;
-// }
-void revert_files(char *newpath,char* lastcommitid){
-    char id[numberofcommits][ID_LEN];
-    int i=0;
-    strcpy(id[0],lastcommitid);
-    while(id[i++]){
-        char path[_MAX_PATH];
-        struct Commitdata commitdata;
-        sprintf(path,"%s\\commit\\%s\\commitdata",neogitpath,id);
-        FILE* file=fopen(path,"rb");
-        fread(&commitdata,sizeof(commitdata),1,file);
-        fclose(file);
-        strcpy(id[i],commitdata.previous_id);
-    }
-    while (i--){
-        char folderpath[_MAX_PATH];
-        sprintf(folderpath,"%s\\commit\\%s",neogitpath,id[i]);
-        ocopyfolder(folderpath,newpath);
-    }
-}
 
-int Ccommit(int argc,const char* argv[]){
-    if (!neogitpath){
-        printf("You didn't initialize the neogit\n");
-        return 1;
-    }
-    if (argc != 2) {
-        printf("Invalid Command");
-        return 1;
-    }
-    char msg[73];
-    if (!strcmp(argv[0],"-s")){
-        FILE*file=findshortcut(argv[1]);
-        if (feof(file)){
-            printf("The shortcut doesn't exist");
-            return 1;
-        }
-        char shortcut[30];
-        struct Shmsg shmsg;
-        fread(&shmsg,sizeof(struct Shmsg),1,file);
-        strcpy(msg,shmsg.msg);
-        fclose(file);
-    } else if (!strcmp(argv[0],"-m")){
-        if (strlen(argv[1]) > MAX_COMMIT_MESSAGE){
-            printf("Your commit message is too long\nMaximum allowed characters are %d",MAX_COMMIT_MESSAGE);
-            return 1;
-        }
-        strcpy(msg,argv[1]);
-    } else {
-        printf("The first argument must be -m or -s");
-        return 1;
-    }
-    char path[MAX_PATH];
-    sprintf(path,"%s\\stage",neogitpath);
-    if (isempty(path)){
-        printf("There is no file in stage");
-        return 1;
-    }
-    struct Commitdata commitdata;
-    initcommitdata(&commitdata,msg);
-    char Path[MAX_PATH];
-    sprintf(Path,"%s\\commits\\%s",neogitpath,commitdata.id);
-    if (mkdir(Path)){
-        printf("error creating commit");
-        return 1;
-    }
-    commitdata.fileschanged=normalcopyfolder(path,Path);
-
-    // lastcommit and laststage
-    sprintf(path,"%s\\laststage",neogitpath);
-    deleteinsidefolder(path);
-    sprintf(path,"%s\\stage",neogitpath);
-    deleteinsidefolder(path);
-    // writing commitdata
-    strcat(Path,"\\commitdata");
-    FILE* file=fopen(Path,"wb");
-    if (!file){
-        printf("Can't open file");
-        return 1;
-    }
-    fwrite(&commitdata,sizeof(struct Commitdata),1,file);
-    fclose(file);
-
-    Path[strlen(Path)-strlen("\\commitdata")]='\0';
-    sprintf(path,"%s\\lastcommit",neogitpath);
-    ocopyfolder(Path,path);
-    sprintf(Path,"%s\\commitdatas",neogitpath);
-    file=fopen(Path,"ab");
-    if (!file){
-        printf("Can't open commitdatas file");
-        return 1;
-    }
-    fwrite(&commitdata,sizeof(commitdata),1,file);
-    fclose(file);
-}
 boolean hastheword(const char*s,const char*word){
     char S[strlen(s)+1];
     strcpy(S,s);
@@ -283,4 +152,35 @@ int Clog(int argc, const char *argv[]){
     }
     fclose(file);
     return 0;
+}
+int printbranchs(){
+    char *branchnames[100];
+    struct Commitdata* branchcommits[100];
+    int count=0;
+    char path[_MAX_PATH];
+    sprintf(path,"%s\\commitdatas",neogitpath);
+    FILE* file=fopen(path,"rb");
+    struct Commitdata cd;
+    while(fread(&cd,sizeof(cd),1,file)){
+        int i=Find_Str(branchnames,cd.branch,count);
+        if (i==-1){
+            branchcommits[count]=(struct Commitdata*)malloc(sizeof(struct Commitdata));
+            memcpy(branchcommits[count],&cd,sizeof(cd));
+            branchnames[count]=(struct Commitdata*)malloc(strlen(cd.branch)+1);
+            strcpy(branchnames[count],cd.branch);
+            count++;
+        } else {
+            memcpy(branchcommits[i],&cd,sizeof(cd));
+        }
+    }
+    for (int i=0;i<count;i++){
+        printf("branchname: %s\n",branchnames[i]);
+        printf("last commitdata:\n");
+        printcommitdata(branchcommits[i]);
+        free(branchnames[i]);
+        free(branchcommits[i]);
+    }
+    fclose(file);
+    return 0;
+    
 }

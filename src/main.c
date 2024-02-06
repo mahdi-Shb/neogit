@@ -14,9 +14,9 @@ void may_the_c_surprise_us(){
 int main(int argc, const char *argv[]){
     may_the_c_surprise_us();
 
-    // chdir("D:\\testing project");
-    // argc=3;
-    // char const *argvkv[]={"neogit", "add", "hehe.txt"};
+    chdir("D:\\testing project");
+    argc=2;
+    char const *argvkv[]={"neogit", "branch"};
 
     if (GlobalInit()){
         return 1;
@@ -26,8 +26,8 @@ int main(int argc, const char *argv[]){
         return 1;
     }
     for (int i=0; i<NUMBER_OF_COMMANDS; i++){
-        if (!strcmp(argv[1],COMMAND_NAMES[i])){
-            return COMMAND_FUNCTIONS[i](argc-2,argv+2);
+        if (!strcmp(argvkv[1],COMMAND_NAMES[i])){
+            return COMMAND_FUNCTIONS[i](argc-2,argvkv+2);
         }
     }
     if (argc!=2 || neogitpath==NULL){

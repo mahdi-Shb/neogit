@@ -9,8 +9,8 @@
 #include "commands.h"
 #include <stdlib.h>
 #include "constant.h"
-const char *COMMAND_NAMES[NUMBER_OF_COMMANDS]={"config","init","reset","status","commit","set","replace","remove","add","log"};
-int (*COMMAND_FUNCTIONS[NUMBER_OF_COMMANDS])(int argc,const char* argv[]) ={Cconfig,Cinit,Creset,Cstatus,Ccommit,Cset,Creplace,Cremove,Cadd,Clog};
+const char *COMMAND_NAMES[NUMBER_OF_COMMANDS]={"config","init","reset","status","commit","set","replace","remove","add","log","branch","revert"};
+int (*COMMAND_FUNCTIONS[NUMBER_OF_COMMANDS])(int argc,const char* argv[]) ={Cconfig,Cinit,Creset,Cstatus,Ccommit,Cset,Creplace,Cremove,Cadd,Clog,Cbranch,Crevert};
 char* neogitpath=NULL;
 int numberofcommits;
 void get_ID(char *ID){
