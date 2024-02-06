@@ -75,25 +75,6 @@ int Cconfig(int argc,const char* argv[]){
             strcpy(alicmd.cmd,argv[1]);
             fwrite(&alicmd,sizeof(alicmd),1,file);
             fclose(file);
-            // char config_path[_MAX_PATH];
-            // sprintf(config_path,"%s\\configs\\alias",neogitpath);
-            // FILE* config_file = fopen(config_path,"r+");
-            // if(!config_file) {
-            //     printf("Error opening configs");
-            //     return 1;
-            // }
-            // int i=0;
-            // char al[50],cmd[200];
-            // while(!feof(config_file)){
-            //     fscanf(config_file,"%s %s",al,cmd);
-            //     if (!strcmp(al,argv[0]+6)){
-            //         fseek(config_file,i*250,SEEK_SET);
-            //         break;
-            //     }
-            //     i++;
-            //     fseek(config_file,i*250,SEEK_SET);
-            // }
-            // fprintf(config_file,"%49s %199s\n",argv[0]+6,argv[1]);
         } else {
             printf("Invalid config key\n");
             return 1;

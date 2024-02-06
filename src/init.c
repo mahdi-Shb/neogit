@@ -22,14 +22,12 @@ int Cinit(int argc,const char* argv[]){
     success=success && !mkdir(".\\.neogit\\configs");
     success=success && !mkdir(".\\.neogit\\lastcommit");
     success=success && !mkdir(".\\.neogit\\commits");
-    // success=success && !mkdir(".\\.neogit\\commits\\specs");
     success=success && !mkdir(".\\.neogit\\stage");
     success=success && !mkdir(".\\.neogit\\laststage");
     
     file=fopen(".\\.neogit\\shortcuts","w");
     success=success && file;
     if (file){
-        // fprintf(file,"%99s\n",DELETE_SHORTCUT);
         fclose(file);
     }
     
@@ -44,15 +42,6 @@ int Cinit(int argc,const char* argv[]){
     if (file){
         fclose(file);
     }
-    
-    // file=fopen(".\\.neogit\\commits\\specs\\numberofcommits","w");
-    // success=success && file;
-    // if (file){
-    //     fprintf(file,"0");
-    //     fclose(file);
-    // }
-    //file=fopen(".\\.neogit\\stage","w");
-    //success=success && file;
     
     file=fopen(".\\.neogit\\configs\\user","w");
     success=success && file;

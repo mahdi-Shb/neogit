@@ -32,7 +32,6 @@ void initcommitdata(struct Commitdata* commitdata,char *msg){
 boolean find_commit_file(char *findpath,const char* subneogitpath,const char* path, int i){
     while (i--){
         char Subneogitpath[100];
-        // char Path[_MAX_PATH];
         sprintf(Subneogitpath,"%s\\%d",subneogitpath,i);
         getneogitpath(findpath,path,Subneogitpath);
         if (fileexist(findpath)){
@@ -40,11 +39,9 @@ boolean find_commit_file(char *findpath,const char* subneogitpath,const char* pa
         }
         strcat(findpath,".delneogit");
         if (fileexist(findpath)){
-            // *findpath='\0';
             return false;
         }
     }
-    // *findpath='\0';
     return false;
 }
 void revert_files(char *newpath,char* lastcommitid){
@@ -65,14 +62,6 @@ void revert_files(char *newpath,char* lastcommitid){
         sprintf(folderpath,"%s\\commit\\%s",neogitpath,id[i]);
         ocopyfolder(folderpath,newpath);
     }
-    // for (int i=0;i<I;i++){
-    //     char Subneogitcommitpath[100];
-    //     // char Path[_MAX_PATH];
-    //     sprintf(Subneogitcommitpath,"%s\\%d",subneogitcommitpath,i);
-    //     getneogitpath(folderpath,path,Subneogitcommitpath);
-    //     fch+=ocopyfolder(folderpath,newpath);
-    // }
-    // return fch;
 }
 
 int Ccommit(int argc,const char* argv[]){
@@ -87,9 +76,6 @@ int Ccommit(int argc,const char* argv[]){
     char msg[73];
     if (!strcmp(argv[0],"-s")){
         FILE*file=findshortcut(argv[1]);
-        // if (oopen(file)){
-        //     return 1;
-        // }
         if (feof(file)){
             printf("The shortcut doesn't exist");
             return 1;

@@ -12,7 +12,6 @@
 const char *COMMAND_NAMES[NUMBER_OF_COMMANDS]={"config","init","reset","status","commit","set","replace","remove","add","log"};
 int (*COMMAND_FUNCTIONS[NUMBER_OF_COMMANDS])(int argc,const char* argv[]) ={Cconfig,Cinit,Creset,Cstatus,Ccommit,Cset,Creplace,Cremove,Cadd,Clog};
 char* neogitpath=NULL;
-// FILE* stagefile=NULL;
 int numberofcommits;
 void get_ID(char *ID){
     // srand(time(0));
@@ -106,18 +105,6 @@ boolean match_wildcard(const char* WCName,const char* name){
     }
     return mwc(name,tok,WCName[strlen(WCName)-1]=='*');
 }
-// boolean match_wildcard_path(const char *path_wild,const char *Path){
-//     if (!strncmp(path_wild,Path,strlen(Path))){
-//         return TRUE;
-//     }
-//     char new_path_wild[strlen(path_wild)+1];
-//     char new_Path[strlen(Path)+1];
-//     strcpy(new_Path,Path);
-//     strcpy(new_path_wild,path_wild);
-//     char *fpw=get_file(path_wild);
-//     char *fP=get_file(Path);
-//     if (strcmp()
-// }
 char *get_file(char *path){
     for (char *result=path+strlen(path)-1; result>=path;result--){
         if (*result=='\\'){
@@ -132,18 +119,7 @@ boolean fileexist(const char*path){
     struct stat fileStat;
     return (stat(path, &fileStat) == 0);
 }
-// boolean commitexists(char *path){
-//     fseek(stagefile, 0, SEEK_SET);
-//     char Path[MAX_PATH];
-//     while (fgets(Path,_MAX_PATH,stagefile)){
-//         if (!strncmp(path,Path,strlen(Path)-1) && strlen(Path)-1){
-//             return true;
-//         }
-//     }
-//     return false;
-// }
 boolean IsStage(const char *path){
-    // return exists(path);
     char newpath[MAX_PATH];
     getneogitpath(newpath,path,"\\stage");
     return fileexist(newpath);
@@ -158,7 +134,6 @@ boolean fsame(FILE* f1, FILE* f2){
     s2=ftell(f2);
     fseek(f2,0,SEEK_SET);
     if (s1!=s2) {
-        // printf("namo");
         return false;
     }
     if (s1==0) {
@@ -169,7 +144,6 @@ boolean fsame(FILE* f1, FILE* f2){
     str2[s1]='\0';
     fread(str1,1,s1+1,f1);
     fread(str2,1,s1+1,f2);
-    // printf("mot");
     return !strcmp(str1,str2);
 }
 boolean psame(char* path1, char* path2){
@@ -191,7 +165,6 @@ void getnotneogitpath(char* newpath,const char* path,const char* neogitsubpath){
 }
 char getY(char *path,char* subneogitpath){
     char Path[MAX_PATH];
-    //find_commit_file(path)
     getneogitpath(Path,path,subneogitpath);
     FILE* commitFile=fopen(Path,"rb");
     FILE* file=fopen(path,"rb");
@@ -219,8 +192,5 @@ void fnprintf(FILE* file,const char* s,int d){
     char a='\0';
     while(d-- > j){
         fputc('\0',file);
-        // fwrite(&a,1,1,file);
-        // fprintf(file,"%c",'\0');
-        // fputc('\0',file);
     }
 }

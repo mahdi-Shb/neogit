@@ -6,69 +6,16 @@
 #include "global_functions.h"
 #include <sys/stat.h>
 #include <stdbool.h>
-// void find_deletes(const char* path){
-//     static Path;
-//     if (path!=NULL){
-//         strcpy(Path,path);
-
-//     }
-
-// }
-void xcopy(const char* path){
-    char cmd[500];
-    char newpath[MAX_PATH];
-    getneogitpath(newpath,path,"\\stage");
-    deletefolder(newpath);
-    if (fileexist(newpath)){
-        printf("oh shit");
-        return;
-    }
-    sprintf(cmd,"xcopy \"%s\" \"%s\" /E /H /C /I",path,newpath);
-    system(cmd);
-}
-void copy(const char* path){
-    char cmd[500];
-    char newpath[MAX_PATH];
-    getneogitpath(newpath,path,"\\stage");
-    if (remove(newpath)){
-        printf("Failed to remove %s\n",newpath);
-        return;
-    }
-    if (fileexist(newpath)){
-        printf("ooooh shit");
-        return;
-    }
-    sprintf(cmd,"copy \"%s\" \"%s\"",path,newpath);
-    system(cmd);
-}
-void Copy(char* path){
-    struct stat st;
-    if (stat(path,&st)==0){   
-        if (S_ISDIR(st.st_mode)) {
-            xcopy(path);
-        } else {
-            copy(path);
-        }
-    } else {
-        char Path[MAX_PATH];
-        getneogitpath(Path,path,"\\stage");
-        deletefolder(Path);
-    }
-    
-}
 void add_path(char* path){
     char newpath[MAX_PATH];
     getneogitpath(newpath,path,"\\stage");
     char checkpath[MAX_PATH];
     getneogitpath(checkpath,path,"\\lastcommit");
-    // printf("checkpath:%s",checkpath);
-    // sprintf(Path+strlen(Path),"%d",numberofstages);
     ncopyfolder(path,newpath,checkpath);
 }
 void reset_path(char* path){
     char Path[MAX_PATH];
     getneogitpath(Path,path,"\\stage");
-    // sprintf(Path+strlen(Path),"%d",numberofstages);
     deletefolder(Path);
 }
 void addone(const char* PATH,boolean a){
@@ -90,36 +37,6 @@ void addone(const char* PATH,boolean a){
     int n=0;
     DIR *dir;
     char *wcname;
-
-    // getneogitpath(Path,path,"\\stage");
-    // wcname=get_file(Path);
-    // dir = opendir(Path);
-    // readdir(dir);
-    // readdir(dir);
-    // while ((entry=readdir(dir))!=NULL){
-    //     if (match_wildcard(wcname,entry->d_name) && strcmp(entry->d_name,".neogit")){
-    //         char p[MAX_PATH];
-    //         sprintf(p,"%s%s",Path,entry->d_name);
-    //         getnotneogitpath(p,p,"\\stage");
-    //         add_path(p);
-    //         n++;
-    //     }
-    // }
-
-    // getneogitpath(Path,path,"\\lastcommit");
-    // wcname=get_file(Path);
-    // dir = opendir(Path);
-    // readdir(dir);
-    // readdir(dir);
-    // while ((entry=readdir(dir))!=NULL){
-    //     if (match_wildcard(wcname,entry->d_name) && strcmp(entry->d_name,".neogit")){
-    //         char p[MAX_PATH];
-    //         sprintf(p,"%s%s",Path,entry->d_name);
-    //         getnotneogitpath(p,p,"\\lastcommit");
-    //         add_path(p);
-    //         n++;
-    //     }
-    // }
 
     strcpy(Path,path);
     wcname=get_file(Path);
@@ -148,7 +65,6 @@ void writeone(int I,struct dirent* entry,char* path,char* lpath,HANDLE hConsole)
     struct stat st;
     stat(path,&st);
     boolean Exists=IsStage(path);
-    
     // if (S_ISDIR(st.st_mode)){
     //     SetConsoleTextAttribute(hConsole,Exists ? FOLDER_COLOR|FOREGROUND_INTENSITY : FOLDER_COLOR);
     // } else{
@@ -211,8 +127,6 @@ int Cadd(int argc,const char* argv[]){
         printf("invalid command");
         return 1;
     }
-    // fseek(stagefile,0,SEEK_END);
-    // fprintf(stagefile,"\n");
     if (!strcmp(argv[0],"-f")){
         char path[MAX_PATH];
         sprintf(path,"%s\\laststage",neogitpath);
@@ -270,8 +184,6 @@ int Creset(int argc,const char* argv[]){
         printf("invalid command");
         return 1;
     }
-    // fseek(stagefile,0,SEEK_END);
-    // fprintf(stagefile,"\n");
     if (!strcmp(argv[0],"-f")){
         char path[MAX_PATH];
         sprintf(path,"%s\\laststage",neogitpath);

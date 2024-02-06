@@ -26,9 +26,6 @@ void copyfile(char*path,char*newpath){
     fwrite(A,sizeof(A),1,newfile);
     fclose(newfile);
     fclose(file);
-    // char cmd[500];
-    // sprintf(cmd,"copy \"%s\" \"%s\"",path,newpath);
-    // system(cmd);
 }
 int ocopyfile(char*path,char*newpath){
     if (psame(path,newpath)){
@@ -53,12 +50,10 @@ int ocopyfolder(char*path,char*newpath){
             printf("can't create directory %s",newpath);
             return -1;
         }
-        //fch++;
     }
     char *lpath=path+strlen(path);
     DIR *dir=opendir(path);
     char *lnewpath=newpath+strlen(newpath);
-    // DIR *newdir=opendir(newpath);
     struct dirent *entry;
     readdir(dir);
     readdir(dir);

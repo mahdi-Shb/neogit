@@ -6,41 +6,9 @@
 // #include <dirent.h>
 // #include <unistd.h>
 // #include <stdbool.h>
-#include "header.h"
 #include "commands.h"
 #include "global_functions.h"
 void may_the_c_surprise_us(){
-    // FILE* file = fopen("aaa.txt", "wb");
-    // fputc('\0',file);
-    // fclose(file);
-    // file = fopen("aaa.txt", "rb");
-    // char a[1];
-    // fread(a,1,1,file);
-    // if (*a=='\0'){
-    //     printf("doroste ke");
-    // }
-    // if (file != NULL) {
-    //     int c;
-
-    //     // Read and print the contents of the file
-    //     printf("File contents:\n");
-    //     while ((c = fgetc(file)) != EOF) {
-    //         putchar(c);
-    //     }
-    //     printf("\n");
-
-    //     // Check if end-of-file indicator is set
-    //     if (feof(file)) {
-    //         printf("Reached end of file.\n");
-    //     } else {
-    //         printf("Read error occurred.\n");
-    //     }
-
-    //     // Close the file
-    //     fclose(file);
-    // } else {
-    //     printf("Failed to open file.\n");
-    // }
 
 }
 int main(int argc, const char *argv[]){
