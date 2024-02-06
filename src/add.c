@@ -40,13 +40,19 @@ void addone(const char* PATH,boolean a){
 
     strcpy(Path,path);
     wcname=get_file(Path);
-    dir = opendir(Path);
-    readdir(dir);
-    readdir(dir);
-    while ((entry=readdir(dir))!=NULL){
-        if (match_wildcard(wcname,entry->d_name) && strcmp(entry->d_name,".neogit")){
+    char stagepath[MAX_PATH],lcommitpath[MAX_PATH];
+    getneogitpath(stagepath,Path,"\\stage");
+    getneogitpath(lcommitpath,Path,"\\lastcommit");
+    //printf("%s %s %s",Path,stage)
+    readdirs(3,Path,stagepath,lcommitpath);
+    // dir = opendir(Path);
+    // readdir(dir);
+    // readdir(dir);
+    char*d_name;
+    while (d_name=readdirs(0)){
+        if (match_wildcard(wcname,d_name) && strcmp(d_name,".neogit")){
             char p[MAX_PATH];
-            sprintf(p,"%s%s",Path,entry->d_name);
+            sprintf(p,"%s%s",Path,d_name);
             if (a){
                 add_path(p);
             } else {
@@ -55,7 +61,7 @@ void addone(const char* PATH,boolean a){
             n++;
         }
     }
-    closedir(dir);
+    // closedir(dir);
     if (!n){
         printf("There is no matching file or directory with the path %s",PATH);
     }
@@ -130,8 +136,7 @@ int Cadd(int argc,const char* argv[]){
     if (!strcmp(argv[0],"-f")){
         char path[MAX_PATH];
         sprintf(path,"%s\\laststage",neogitpath);
-        // deletefolder(path);
-        // mkdir(path);
+        deleteinsidefolder(path);
         char Path[MAX_PATH];
         sprintf(Path,"%s\\stage",neogitpath);
         ocopyfolder(Path,path);
@@ -162,8 +167,7 @@ int Cadd(int argc,const char* argv[]){
     } else {
         char path[MAX_PATH];
         sprintf(path,"%s\\laststage",neogitpath);
-        // deletefolder(path);
-        // mkdir(path);
+        deleteinsidefolder(path);
         char Path[MAX_PATH];
         sprintf(Path,"%s\\stage",neogitpath);
         ocopyfolder(Path,path);
@@ -187,8 +191,7 @@ int Creset(int argc,const char* argv[]){
     if (!strcmp(argv[0],"-f")){
         char path[MAX_PATH];
         sprintf(path,"%s\\laststage",neogitpath);
-        // deletefolder(path);
-        // mkdir(path);
+        deleteinsidefolder(path);
         char Path[MAX_PATH];
         sprintf(Path,"%s\\stage",neogitpath);
         ocopyfolder(Path,path);
@@ -206,8 +209,7 @@ int Creset(int argc,const char* argv[]){
     } else {
         char path[MAX_PATH];
         sprintf(path,"%s\\laststage",neogitpath);
-        // deletefolder(path);
-        // mkdir(path);
+        deleteinsidefolder(path);
         char Path[MAX_PATH];
         sprintf(Path,"%s\\stage",neogitpath);
         ocopyfolder(Path,path);

@@ -149,8 +149,8 @@ boolean fsame(FILE* f1, FILE* f2){
 boolean psame(char* path1, char* path2){
     FILE* f1 = fopen(path1,"r");
     FILE* f2 = fopen(path2,"r");
-    if (!f1) printf("psamefunction:error opening file %s\n",path1);
-    if (!f2) printf("psamefunction:error opening file %s\n",path2);
+    if (!f1) return false;//printf("psamefunction:error opening file %s\n",path1);
+    if (!f2) return false;//printf("psamefunction:error opening file %s\n",path2);
     boolean a=fsame(f1,f2);
     fclose(f1);
     fclose(f2);
@@ -163,6 +163,16 @@ void getnotneogitpath(char* newpath,const char* path,const char* neogitsubpath){
     strcpy(newpath,path);
     memmove(newpath+strlen(neogitpath)-strlen("\\.neogit"),newpath+strlen(neogitpath)+strlen(neogitsubpath),1+strlen(newpath+strlen(neogitpath)+strlen(neogitsubpath)));
 }
+// void getnormalpath(char* newpath,const char* path,const char* neogitsubpath){
+//     if (!strncmp(path,neogitpath,strlen(neogitpath))){
+//         //char p[MAX_PATH];
+//         strcpy(newpath,neogitpath);
+//         sprintf(newpath+strlen(neogitpath)-strlen("\\.neogit"),"%s",strchr(path+strlen(neogitpath)+1,'\\'));
+//         getnotneogitpath(newpath,path,neogitsubpath);
+//     } else{
+//         strcpy(newpath,path);
+//     }
+// }
 char getY(char *path,char* subneogitpath){
     char Path[MAX_PATH];
     getneogitpath(Path,path,subneogitpath);

@@ -28,22 +28,21 @@ void initcommitdata(struct Commitdata* commitdata,char *msg){
     }
     commitdata->T=time(NULL);
 }
-    
-boolean find_commit_file(char *findpath,const char* subneogitpath,const char* path, int i){
-    while (i--){
-        char Subneogitpath[100];
-        sprintf(Subneogitpath,"%s\\%d",subneogitpath,i);
-        getneogitpath(findpath,path,Subneogitpath);
-        if (fileexist(findpath)){
-            return true;
-        }
-        strcat(findpath,".delneogit");
-        if (fileexist(findpath)){
-            return false;
-        }
-    }
-    return false;
-}
+// boolean find_commit_file(char *findpath,const char* subneogitpath,const char* path, int i){
+//     while (i--){
+//         char Subneogitpath[100];
+//         sprintf(Subneogitpath,"%s\\%d",subneogitpath,i);
+//         getneogitpath(findpath,path,Subneogitpath);
+//         if (fileexist(findpath)){
+//             return true;
+//         }
+//         strcat(findpath,".delneogit");
+//         if (fileexist(findpath)){
+//             return false;
+//         }
+//     }
+//     return false;
+// }
 void revert_files(char *newpath,char* lastcommitid){
     char id[numberofcommits][ID_LEN];
     int i=0;
@@ -99,6 +98,7 @@ int Ccommit(int argc,const char* argv[]){
     sprintf(path,"%s\\stage",neogitpath);
     if (isempty(path)){
         printf("There is no file in stage");
+        return 1;
     }
     struct Commitdata commitdata;
     initcommitdata(&commitdata,msg);

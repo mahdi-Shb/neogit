@@ -32,7 +32,12 @@ int ocopyfile(char*path,char*newpath){
         return 0;
     }
     remove(newpath);
-    copyfile(path,newpath);
+    printf("h");
+    
+    if (!isdeletefile(path)){
+        printf("|%s|",path);
+        copyfile(path,newpath);
+    }
     return 1;
 }
 int ocopyfolder(char*path,char*newpath){
@@ -69,14 +74,42 @@ int ocopyfolder(char*path,char*newpath){
 }
 //not overwrite copy file
 //used for add
+void makedeletefile(char*path){
+    FILE *f=fopen(path,"w");
+    fwrite(DELETE_TEXT,sizeof(DELETE_TEXT),1,f);
+    fclose(f);
+}
+boolean isdeletefile(char*path){
+    FILE *f=fopen(path,"r");
+    if (!f) return false;
+    char dt[sizeof(DELETE_TEXT)];
+    fread(dt,sizeof(DELETE_TEXT),1,f);
+    boolean idf = feof(f) && !strcmp(dt,DELETE_TEXT);
+    fclose(f);
+    return idf;
+}
 boolean ncopyfile(char*path,char*newpath,char*checkpath){
-    if (fileexist(newpath)){
-        return false;
-    }
-    if (!psame(path,checkpath)){
-        copyfile(path,newpath);
-        return true;
+    if (fileexist(path)){
+        if (fileexist(newpath)){ // inja gofte boodin age vojood dashte copy nakone
+            return false;
+        }
+        if (!psame(path,checkpath)){
+            copyfile(path,newpath);
+            return true;
+        } else {
+            return false;
+        }
     } else {
+        if (fileexist(checkpath)){
+            if (isdeletefile(newpath)){
+                return false;
+            }
+            makedeletefile(newpath);
+            return true;
+        } else if (fileexist(newpath)){
+            remove(newpath);
+            return true;
+        }
         return false;
     }
 }

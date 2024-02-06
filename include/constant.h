@@ -1,5 +1,6 @@
 #ifndef _CONSTANT_H_
 #define _CONSTANT_H_
+#define DELETE_TEXT ", m4tm3,gm34jkl3cjp34090groi`39`9rfhoiur=+`48484309googoolimagoolivui"
 #define DEFAULT_GMAIL "defaultgmail@gmail.com"
 #define DEFAULT_NAME "defaultuser"
 #define DEFAULT_BRANCH "master"

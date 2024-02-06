@@ -13,11 +13,10 @@ void may_the_c_surprise_us(){
 }
 int main(int argc, const char *argv[]){
     may_the_c_surprise_us();
+
     // chdir("D:\\testing project");
-    // char a[]="log";
-    // char b[]=".";
-    // argc=4;
-    // char const *argvkv[]={"neogit", "log", "-search" ,"a*"};
+    // argc=3;
+    // char const *argvkv[]={"neogit", "add", "hehe.txt"};
 
     if (GlobalInit()){
         return 1;

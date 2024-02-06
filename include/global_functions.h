@@ -1,5 +1,6 @@
 #ifndef _GLOBAL_FUNCIONS_H_
 #define _GLOBAL_FUNCTIONS_H_
+#define name(...) readdirs(0, __VA_ARGS__, (char *)NULL)
 #include <dirent.h>
 #include <time.h>
 #include <constant.h>
@@ -46,5 +47,8 @@ boolean ncopyfolder(char*path,char*newpath,char*checkpath);
 boolean isempty(char*path);
 void deletefolder(char* path);
 void deleteinsidefolder(char* path);
+void makedeletefile(char*path);
+boolean isdeletefile(char*path);
 
+char* readdirs(int count,...);
 #endif
