@@ -166,7 +166,7 @@ int printbranchs(){
         if (i==-1){
             branchcommits[count]=(struct Commitdata*)malloc(sizeof(struct Commitdata));
             memcpy(branchcommits[count],&cd,sizeof(cd));
-            branchnames[count]=(struct Commitdata*)malloc(strlen(cd.branch)+1);
+            branchnames[count]=(char *)malloc(strlen(cd.branch)+1);
             strcpy(branchnames[count],cd.branch);
             count++;
         } else {
