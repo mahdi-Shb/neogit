@@ -1,5 +1,8 @@
 #ifndef _CONSTANT_H_
 #define _CONSTANT_H_
+#define DEFAULT_GMAIL "defaultgmail@gmail.com"
+#define DEFAULT_NAME "defaultuser"
+#define DEFAULT_BRANCH "master"
 #define _MAX_CONFIG_SIZE 100
 #define MAX_COMMIT_MESSAGE 72
 #define DELETE_SHORTCUT "_DELETE_SHORTCUT"

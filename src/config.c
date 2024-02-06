@@ -38,7 +38,7 @@ int Cconfig(int argc,const char* argv[]){
         }
         // ...----------------------
     } else if (argc==2){
-        if (strncmp(argv[0],"user.",5)){
+        if (!strncmp(argv[0],"user.",5)){
             char config_path[_MAX_PATH];
             sprintf(config_path,"%s\\configs\\user",neogitpath);
             FILE* config_file = fopen(config_path,"r");
@@ -46,8 +46,8 @@ int Cconfig(int argc,const char* argv[]){
                 printf("Error opening configs");
                 return 1;
             }
-            char name[100];
-            char gmail[100];
+            char name[100]="";
+            char gmail[100]="";
             fscanf(config_file,"%s%s",name,gmail);
             fclose(config_file);
             config_file = fopen(config_path,"w");
@@ -56,23 +56,24 @@ int Cconfig(int argc,const char* argv[]){
                 return 1;
             }
 
-            if (strncmp(argv[0]+5,"gmail",5)){
+            if (!strncmp(argv[0]+5,"gmail",5)){
                 fprintf(config_file,"%s\n%s",name,argv[1]);
-            } else if (strncmp(argv[0]+5,"name",5)){
+            } else if (!strncmp(argv[0]+5,"name",5)){
                 fprintf(config_file,"%s\n%s",argv[1],gmail);
             } else {
                 printf("Invalid config key\n");
                 return 1;
             }
-        } else if (strncmp(argv[0],"alias.",6)){
+            fclose(config_file);
+        } else if (!strncmp(argv[0],"alias.",6)){
             FILE* file = findalias(argv[0]+6);
             if (!file){
-                return;
+                return 1;
             }
-            struct alicmd;
+            struct Alicmd alicmd;
             strcpy(alicmd.ali,argv[0]+6);
             strcpy(alicmd.cmd,argv[1]);
-            fwrite(alicmd,sizeof(alicmd),1,file);
+            fwrite(&alicmd,sizeof(alicmd),1,file);
             fclose(file);
             // char config_path[_MAX_PATH];
             // sprintf(config_path,"%s\\configs\\alias",neogitpath);

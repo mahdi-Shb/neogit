@@ -17,19 +17,19 @@ int Cinit(int argc,const char* argv[]){
         return 1;
     }
     boolean success=TRUE;
-    //making files and dirs inside neogit:
+    //making files and dirs inside neogit:stage
     FILE* file;
     success=success && !mkdir(".\\.neogit\\configs");
     success=success && !mkdir(".\\.neogit\\lastcommit");
     success=success && !mkdir(".\\.neogit\\commits");
-    success=success && !mkdir(".\\.neogit\\commits\\specs");
+    // success=success && !mkdir(".\\.neogit\\commits\\specs");
     success=success && !mkdir(".\\.neogit\\stage");
     success=success && !mkdir(".\\.neogit\\laststage");
     
     file=fopen(".\\.neogit\\shortcuts","w");
     success=success && file;
     if (file){
-        fprintf(file,"%99s\n",DELETE_SHORTCUT);
+        // fprintf(file,"%99s\n",DELETE_SHORTCUT);
         fclose(file);
     }
     
@@ -39,12 +39,18 @@ int Cinit(int argc,const char* argv[]){
         fclose(file);
     }
     
-    file=fopen(".\\.neogit\\commits\\specs\\numberofcommits","w");
+    file=fopen(".\\.neogit\\commitdatas","w");
     success=success && file;
     if (file){
-        fprintf(file,"0");
         fclose(file);
     }
+    
+    // file=fopen(".\\.neogit\\commits\\specs\\numberofcommits","w");
+    // success=success && file;
+    // if (file){
+    //     fprintf(file,"0");
+    //     fclose(file);
+    // }
     //file=fopen(".\\.neogit\\stage","w");
     //success=success && file;
     
@@ -55,7 +61,7 @@ int Cinit(int argc,const char* argv[]){
         printf("Failed to initialize neogit");
         return 1;
     }
-    fprintf(file,"%s\n%s",defaultname,defaultgmail);
+    fprintf(file,"%s\n%s",DEFAULT_NAME,DEFAULT_GMAIL);
     fclose(file);
     printf("Initialized successfully\n");
     return 0;

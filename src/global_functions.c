@@ -8,20 +8,16 @@
 #include "global_functions.h"
 #include "commands.h"
 #include <stdlib.h>
-#include <time.h>
 #include "constant.h"
-const char *COMMAND_NAMES[NUMBER_OF_COMMANDS]={"config","init","reset","undo","status","commit","set","replace","remove","add"};
-int (*COMMAND_FUNCTIONS[NUMBER_OF_COMMANDS])(int argc,const char* argv[]) ={Cconfig,Cinit,Creset,Cundo,Cstatus,Ccommit,Cset,Creplace,Cremove,Cadd};
+const char *COMMAND_NAMES[NUMBER_OF_COMMANDS]={"config","init","reset","status","commit","set","replace","remove","add","log"};
+int (*COMMAND_FUNCTIONS[NUMBER_OF_COMMANDS])(int argc,const char* argv[]) ={Cconfig,Cinit,Creset,Cstatus,Ccommit,Cset,Creplace,Cremove,Cadd,Clog};
 char* neogitpath=NULL;
-FILE* stagefile=NULL;
+// FILE* stagefile=NULL;
 int numberofcommits;
-char defaultgmail[100]="...@gmail.com";
-char defaultname[100]="...";
-
 void get_ID(char *ID){
     // srand(time(0));
     // int a=rand();
-    int id=numberofcommits;
+    int id=numberofcommits+1;
     sprintf(ID,"%d",id);
 }
 char **Readlines(FILE* file){
@@ -54,6 +50,7 @@ void FindNeoGitDir(){
             neogitpath=(char*)malloc(sizeof(full_path));
             strcpy(neogitpath,full_path);
             break;
+            closedir(neogitdir);
         }
         sprintf(path+i,"..\\.neogit");
     }
@@ -62,15 +59,17 @@ int GlobalInit(){
     FindNeoGitDir();
     if (neogitpath){
         char A[MAX_PATH];
-        sprintf(A,"%s\\commits\\specs\\numberofcommits",neogitpath);
+        sprintf(A,"%s\\commitdatas",neogitpath);
         FILE* file=fopen(A,"r");
         if (file){
-            fscanf(file,"%d",&numberofcommits);
+            fseek(file,0,SEEK_END);
+            numberofcommits=ftell(file)/sizeof(struct Commitdata);
             fclose(file);
         } else {
             printf("Can't open numberofcommits file");
             return 1;
         }
+        fclose(file);
         
     }
     return 0;
@@ -105,7 +104,7 @@ boolean match_wildcard(const char* WCName,const char* name){
     } else {
         tok=strtok(wcname,"*");
     }
-    return mwc(name,tok,wcname[strlen(wcname)-1]=='*');
+    return mwc(name,tok,WCName[strlen(WCName)-1]=='*');
 }
 // boolean match_wildcard_path(const char *path_wild,const char *Path){
 //     if (!strncmp(path_wild,Path,strlen(Path))){
@@ -159,17 +158,29 @@ boolean fsame(FILE* f1, FILE* f2){
     s2=ftell(f2);
     fseek(f2,0,SEEK_SET);
     if (s1!=s2) {
+        // printf("namo");
         return false;
     }
+    if (s1==0) {
+        return true;
+    }
     char str1[s1+1],str2[s1+1];
+    str1[s1]='\0';
+    str2[s1]='\0';
     fread(str1,1,s1+1,f1);
     fread(str2,1,s1+1,f2);
+    // printf("mot");
     return !strcmp(str1,str2);
 }
 boolean psame(char* path1, char* path2){
     FILE* f1 = fopen(path1,"r");
     FILE* f2 = fopen(path2,"r");
-    return fsame(f1,f2);
+    if (!f1) printf("psamefunction:error opening file %s\n",path1);
+    if (!f2) printf("psamefunction:error opening file %s\n",path2);
+    boolean a=fsame(f1,f2);
+    fclose(f1);
+    fclose(f2);
+    return a;
 }
 void getneogitpath(char* newpath,const char* path,const char* neogitsubpath){
     sprintf(newpath,"%s%s%s",neogitpath,neogitsubpath,path+strlen(neogitpath)-strlen("\\.neogit"));
@@ -185,14 +196,20 @@ char getY(char *path,char* subneogitpath){
     FILE* commitFile=fopen(Path,"rb");
     FILE* file=fopen(path,"rb");
     if(!commitFile){
+        fclose(file);
         return 'A';
     }
     if (!file){
+        fclose(commitFile);
         return 'D';
     }
     if (!fsame(file,commitFile)){
+        fclose(file);
+        fclose(commitFile);
         return 'M';
     } else {
+        fclose(file);
+        fclose(commitFile);
         return '\0';
     }
 }

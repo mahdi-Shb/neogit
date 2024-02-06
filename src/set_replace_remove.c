@@ -27,6 +27,10 @@ FILE* findshortcut(const char* shortcut){
     return file;
 }
 int Cset(int argc,const char* argv[]){
+    if (!neogitpath){
+        printf("You didn't initialize the neogit\n");
+        return 1;
+    }
     if (argc != 4){
         printf("Error: invalid number of arguments for set command\n");
         return 1;
@@ -63,6 +67,10 @@ int Cset(int argc,const char* argv[]){
     fclose(file);
 } 
 int Creplace(int argc,const char* argv[]){
+    if (!neogitpath){
+        printf("You didn't initialize the neogit\n");
+        return 1;
+    }
     if (argc != 4){
         printf("Error: invalid number of arguments for set command\n");
         return 1;
@@ -96,6 +104,10 @@ int Creplace(int argc,const char* argv[]){
     return 0;
 }
 int Cremove(int argc,const char* argv[]){
+    if (!neogitpath){
+        printf("You didn't initialize the neogit\n");
+        return 1;
+    }
     if (argc != 2){
         printf("Error: invalid number of arguments for set command\n");
         return 1;

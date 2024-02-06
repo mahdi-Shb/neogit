@@ -57,31 +57,21 @@ void Copy(char* path){
     
 }
 void add_path(char* path){
+    char newpath[MAX_PATH];
+    getneogitpath(newpath,path,"\\stage");
+    char checkpath[MAX_PATH];
+    getneogitpath(checkpath,path,"\\lastcommit");
+    // printf("checkpath:%s",checkpath);
+    // sprintf(Path+strlen(Path),"%d",numberofstages);
+    ncopyfolder(path,newpath,checkpath);
+}
+void reset_path(char* path){
     char Path[MAX_PATH];
     getneogitpath(Path,path,"\\stage");
     // sprintf(Path+strlen(Path),"%d",numberofstages);
-    ncopyfolder(path,Path);
-    // char* lpath=path+strlen(path);
-    //     DIR *d = opendir(path);
-    //     struct dirent *entry;
-    //     readdir(d);
-    //     readdir(d);
-    //     while ((entry = readdir(d))) {
-    //         strcat(path,entry->d_name);
-    //         add_path(path);
-    //     }
-    //     *lpath='\0';
-    // } else {
-    //     if (IsStage(path)){
-    //         printf("%s has already added",path);
-    //     } else {
-
-    //         fprintf(stagefile,"%s\n",path);
-    //         printf("%s added successfully",path);
-    //     }
-    // }
+    deletefolder(Path);
 }
-void addone(const char* PATH){
+void addone(const char* PATH,boolean a){
     char path[_MAX_PATH];
     GetFullPathNameA(PATH,_MAX_PATH,path,NULL);
     struct stat st;
@@ -93,7 +83,7 @@ void addone(const char* PATH){
 
     if (!strncmp(path,neogitpath,strlen(path))){
         strcat(path,".\\*");
-        addone(path);
+        addone(path,a);
         return;
     }
     char Path[_MAX_PATH];
@@ -140,11 +130,15 @@ void addone(const char* PATH){
         if (match_wildcard(wcname,entry->d_name) && strcmp(entry->d_name,".neogit")){
             char p[MAX_PATH];
             sprintf(p,"%s%s",Path,entry->d_name);
-            add_path(p);
+            if (a){
+                add_path(p);
+            } else {
+                reset_path(p);
+            }
             n++;
         }
     }
-    
+    closedir(dir);
     if (!n){
         printf("There is no matching file or directory with the path %s",PATH);
     }
@@ -185,6 +179,7 @@ void Write(int depth, int I, char* path, char* lpath, HANDLE hConsole){
             *lpath='\0';
         }
     }
+    closedir(dir);
 }
 void WWrite(int depth){
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -195,16 +190,40 @@ void WWrite(int depth){
     Write(depth,0,path,lpath,hConsole);
     SetConsoleTextAttribute(hConsole,FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_RED);
 }
+void undo(){
+    char path1[MAX_PATH],path2[MAX_PATH],pathtemp[MAX_PATH];
+    sprintf(path1,"%s\\stage",neogitpath);
+    sprintf(path2,"%s\\laststage",neogitpath);
+    sprintf(pathtemp,"%s\\temp",neogitpath);
+    ocopyfolder(path1,pathtemp);
+    deleteinsidefolder(path1);
+    ocopyfolder(path2,path1);
+    deleteinsidefolder(path2);
+    ocopyfolder(pathtemp,path2);
+    deletefolder(pathtemp);
+}
 int Cadd(int argc,const char* argv[]){
     if (!neogitpath){
         printf("You didn't initialize the neogit\n");
         return 1;
     }
-    fseek(stagefile,0,SEEK_END);
-    fprintf(stagefile,"\n");
+    if (argc==0){
+        printf("invalid command");
+        return 1;
+    }
+    // fseek(stagefile,0,SEEK_END);
+    // fprintf(stagefile,"\n");
     if (!strcmp(argv[0],"-f")){
-        for (int i=0;i<argc;i++){
-            addone(argv[i]);
+        char path[MAX_PATH];
+        sprintf(path,"%s\\laststage",neogitpath);
+        // deletefolder(path);
+        // mkdir(path);
+        char Path[MAX_PATH];
+        sprintf(Path,"%s\\stage",neogitpath);
+        ocopyfolder(Path,path);
+
+        for (int i=1;i<argc;i++){
+            addone(argv[i],true);
         }
         return 0;
     } else if (!strcmp(argv[0],"-n")){
@@ -220,14 +239,70 @@ int Cadd(int argc,const char* argv[]){
             }
         }
         WWrite(depth);
+    }else if (!strcmp(argv[0],"-redo")){
+        if (argc!=1){
+            printf("So much arguments!");
+            return 1;
+        }
+        undo();
     } else {
-        if (argc==0){
-            printf("invalid command");
-        } else {
-            addone(argv[0]);
-            if (argc>1){
-                printf("if you want to add multiple files use -f option\n");
-            }
+        char path[MAX_PATH];
+        sprintf(path,"%s\\laststage",neogitpath);
+        // deletefolder(path);
+        // mkdir(path);
+        char Path[MAX_PATH];
+        sprintf(Path,"%s\\stage",neogitpath);
+        ocopyfolder(Path,path);
+
+        addone(argv[0],true);
+        if (argc>1){
+            printf("Only the first path added\nIf you want to add multiple files use -f option");
+        }
+    }
+    return 0;
+}
+int Creset(int argc,const char* argv[]){
+    if (!neogitpath){
+        printf("You didn't initialize the neogit\n");
+        return 1;
+    }
+    if (argc==0){
+        printf("invalid command");
+        return 1;
+    }
+    // fseek(stagefile,0,SEEK_END);
+    // fprintf(stagefile,"\n");
+    if (!strcmp(argv[0],"-f")){
+        char path[MAX_PATH];
+        sprintf(path,"%s\\laststage",neogitpath);
+        // deletefolder(path);
+        // mkdir(path);
+        char Path[MAX_PATH];
+        sprintf(Path,"%s\\stage",neogitpath);
+        ocopyfolder(Path,path);
+
+        for (int i=1;i<argc;i++){
+            addone(argv[i],false);
+        }
+        return 0;
+    } else if (!strcmp(argv[0],"-undo")){
+        if (argc!=1){
+            printf("So much arguments!");
+            return 1;
+        }
+        undo();
+    } else {
+        char path[MAX_PATH];
+        sprintf(path,"%s\\laststage",neogitpath);
+        // deletefolder(path);
+        // mkdir(path);
+        char Path[MAX_PATH];
+        sprintf(Path,"%s\\stage",neogitpath);
+        ocopyfolder(Path,path);
+
+        addone(argv[0],false);
+        if (argc>1){
+            printf("Only the first path reset\nIf you want to reset multiple files use -f option");
         }
     }
     return 0;

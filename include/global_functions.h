@@ -1,12 +1,14 @@
 #ifndef _GLOBAL_FUNCIONS_H_
 #define _GLOBAL_FUNCTIONS_H_
 #include <dirent.h>
+#include <time.h>
 #include <constant.h>
 struct Commitdata{
     // char committype;//c:commit //s:stage //u:unstage
     char id[ID_LEN+1],branch[100];
     char msg[73],username[50],previous_id[ID_LEN+1];
     int fileschanged;
+    time_t T;
 };
 struct Shmsg{
     char sh[27],msg[73];
@@ -29,7 +31,6 @@ boolean fsame(FILE* f1, FILE* f2);
 boolean psame(char* path1, char* path2);
 void getneogitpath(char *newpath,const char *path,const char *neogitsubpath);
 void getnotneogitpath(char *newpath,const char *path,const char *neogitsubpath);
-void deletefolder(char* path);
 char *get_file(char *path);
 int GlobalInit();
 void get_ID(char *);
@@ -39,9 +40,14 @@ void fnprintf(FILE* file, const char *str, int d);
 FILE* findshortcut(const char* shortcut);
 FILE* findalias(const char* alias);
 boolean find_commit_file(char *findpath,const char* subneogitpath,const char* path, int i);
-int copy_commit_file(char *newpath,char *path,char *subneogitcommitpath,int I);
+void revert_files(char *newpath,char* lastcommitid);
+// int copy_commit_files(char *newpath,char *path,char *subneogitcommitpath,int I);
 int ocopyfile(char*path,char*newpath);
 int ocopyfolder(char*path,char*newpath);
-boolean ncopyfile(char*path,char*newpath);
-boolean ncopyfolder(char*path,char*newpath);
+boolean ncopyfile(char*path,char*newpath,char*checkpath);
+boolean ncopyfolder(char*path,char*newpath,char*checkpath);
+boolean isempty(char*path);
+void deletefolder(char* path);
+void deleteinsidefolder(char* path);
+
 #endif

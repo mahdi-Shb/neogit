@@ -12,14 +12,30 @@
 #include "constant.h"
 //overwrite copy file
 //used for commits
+void copyfile(char*path,char*newpath){
+    FILE* file = fopen(path,"rb");
+    FILE* newfile = fopen(newpath,"wb");
+    if (!file || !newfile){
+        printf("Copying error");
+        return;
+    }
+    fseek(file,0,SEEK_END);
+    char A[ftell(file)];
+    fseek(file,0,SEEK_SET);
+    fread(A,sizeof(A),1,file);
+    fwrite(A,sizeof(A),1,newfile);
+    fclose(newfile);
+    fclose(file);
+    // char cmd[500];
+    // sprintf(cmd,"copy \"%s\" \"%s\"",path,newpath);
+    // system(cmd);
+}
 int ocopyfile(char*path,char*newpath){
     if (psame(path,newpath)){
         return 0;
     }
     remove(newpath);
-    char cmd[500];
-    sprintf(cmd,"copy %s %s",path,newpath);
-    system(cmd);
+    copyfile(path,newpath);
     return 1;
 }
 int ocopyfolder(char*path,char*newpath){
@@ -33,13 +49,16 @@ int ocopyfolder(char*path,char*newpath){
     }
     int fch=0;
     if (!fileexist(newpath)){
-        mkdir(newpath);
-        fch++;
+        if (mkdir(newpath)){
+            printf("can't create directory %s",newpath);
+            return -1;
+        }
+        //fch++;
     }
     char *lpath=path+strlen(path);
     DIR *dir=opendir(path);
     char *lnewpath=newpath+strlen(newpath);
-    DIR *newdir=opendir(newpath);
+    // DIR *newdir=opendir(newpath);
     struct dirent *entry;
     readdir(dir);
     readdir(dir);
@@ -50,20 +69,23 @@ int ocopyfolder(char*path,char*newpath){
         *lpath='\0';
         *lnewpath='\0';
     }
+    closedir(dir);
     return fch;
 }
 //not overwrite copy file
 //used for add
-boolean ncopyfile(char*path,char*newpath){
+boolean ncopyfile(char*path,char*newpath,char*checkpath){
     if (fileexist(newpath)){
         return false;
     }
-    char cmd[500];
-    sprintf(cmd,"copy %s %s",path,newpath);
-    system(cmd);
-    return true;
+    if (!psame(path,checkpath)){
+        copyfile(path,newpath);
+        return true;
+    } else {
+        return false;
+    }
 }
-boolean ncopyfolder(char*path,char*newpath){
+boolean ncopyfolder(char*path,char*newpath,char *checkpath){
     if (!strcmp(newpath,neogitpath)||!strcmp(path,neogitpath)){
         return false;
     }
@@ -71,27 +93,33 @@ boolean ncopyfolder(char*path,char*newpath){
     struct stat st;
     stat(path,&st);
     if (!S_ISDIR(st.st_mode)){
-        return ncopyfile(path,newpath);
+        return ncopyfile(path,newpath,checkpath);
     }
     if (!fileexist(newpath)){
         mkdir(newpath);
         didcopied=true;
     }
     char *lpath=path+strlen(path);
-    DIR *dir=opendir(path);
     char *lnewpath=newpath+strlen(newpath);
-    DIR *newdir=opendir(newpath);
+    char *lcheckpath=checkpath+strlen(checkpath);
+    DIR *dir=opendir(path);
+    // DIR *newdir=opendir(newpath);
     struct dirent *entry;
     readdir(dir);
     readdir(dir);
     while (entry=readdir(dir)){
         sprintf(lpath,"\\%s",entry->d_name);
         sprintf(lnewpath,"\\%s",entry->d_name);
-        didcopied=didcopied || ncopyfolder(path,newpath);
+        sprintf(lcheckpath,"\\%s",entry->d_name);
+        boolean fl=ncopyfolder(path,newpath,checkpath);
+        didcopied=didcopied || fl;
         *lpath='\0';
         *lnewpath='\0';
+        *lcheckpath='\0';
     }
+    closedir(dir);
     return didcopied;
+
 }
 void deletefolder(char* path){
     if (!strcmp(path,neogitpath)){
@@ -113,5 +141,26 @@ void deletefolder(char* path){
         deletefolder(path);
         *lpath='\0';
     }
+    closedir(dir);
     rmdir(path);
+}
+void deleteinsidefolder(char* path){
+    char *lpath=path+strlen(path);
+    DIR *dir=opendir(path);
+    struct dirent *entry;
+    readdir(dir);
+    readdir(dir);
+    while (entry=readdir(dir)){
+        sprintf(lpath,"\\%s",entry->d_name);
+        deletefolder(path);
+        *lpath='\0';
+    }
+    closedir(dir);
+}
+
+boolean isempty(char*path){
+    DIR *dir=opendir(path);
+    readdir(dir);
+    readdir(dir);
+    return !readdir(dir);
 }

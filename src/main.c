@@ -43,13 +43,13 @@ void may_the_c_surprise_us(){
     // }
 
 }
-int main(int argc, char *argv[]){
+int main(int argc, const char *argv[]){
     may_the_c_surprise_us();
     // chdir("D:\\testing project");
-    // char a[]="add";
+    // char a[]="log";
     // char b[]=".";
-    // argc=3;
-    // char const *argv[]={argvv[0],a,b};
+    // argc=4;
+    // char const *argvkv[]={"neogit", "log", "-search" ,"a*"};
 
     if (GlobalInit()){
         return 1;
@@ -58,7 +58,12 @@ int main(int argc, char *argv[]){
         printf("khob alan man chi ro ejra konam barat? :|");
         return 1;
     }
-    if (argc!=2){
+    for (int i=0; i<NUMBER_OF_COMMANDS; i++){
+        if (!strcmp(argv[1],COMMAND_NAMES[i])){
+            return COMMAND_FUNCTIONS[i](argc-2,argv+2);
+        }
+    }
+    if (argc!=2 || neogitpath==NULL){
         printf("chert voroodi dadi dadash");
     }
 
@@ -82,7 +87,7 @@ int main(int argc, char *argv[]){
     }
     for (int i=0; i<NUMBER_OF_COMMANDS; i++){
         if (!strcmp(argvv[1],COMMAND_NAMES[i])){
-            return COMMAND_FUNCTIONS[i](argc-2,argvv+2);
+            return COMMAND_FUNCTIONS[i](argc-2,(const char **)(argvv+2));
         }
     }
     printf("chert voroodi dadi dadash");
