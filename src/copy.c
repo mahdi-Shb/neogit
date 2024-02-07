@@ -13,6 +13,19 @@
 char DELETE_TEXT[]=", m4tm3,gm34jkl3cjp34090groi`39`9rfhoiur=+`48484309googoolimagoolivui";
 //overwrite copy file
 //used for commits
+void crdir(char *path){
+    if (fileexist(path)){
+        return;
+    }
+    char*lpath=path+strlen(path);
+    while (*lpath!='\\'){
+        lpath--;
+    }
+    *lpath = '\0';
+    crdir(path);
+    *lpath ='\\';
+    mkdir(path);
+}
 void copyfile(char*path,char*newpath){
     FILE* file = fopen(path,"rb");
     FILE* newfile = fopen(newpath,"wb");
@@ -85,12 +98,10 @@ boolean isdeletefile(char*path){
     fread(dt,sizeof(DELETE_TEXT),1,f);
     char aa;
     boolean idf = !fread(&aa,1,1,f) && !strcmp(dt,DELETE_TEXT);
-    printf("%d %d %d\n",idf,!strcmp(dt,DELETE_TEXT),feof(f));
     fclose(f);
     return idf;
 }
 boolean ncopyfile(char*path,char*newpath,char*checkpath){
-    printf("ara");
     if (fileexist(path)){
         if (fileexist(newpath)){ // inja gofte boodin age vojood dashte copy nakone
             return false;

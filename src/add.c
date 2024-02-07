@@ -29,7 +29,8 @@ void addone(const char* PATH,boolean a){
     }
 
     if (!strncmp(path,neogitpath,strlen(path))){
-        strcat(path,"\\*");
+        strcat(path,"\\");
+        strcat(path,WCSTR);
         addone(path,a);
         return;
     }
@@ -43,7 +44,7 @@ void addone(const char* PATH,boolean a){
     char stagepath[MAX_PATH],lcommitpath[MAX_PATH];
     getneogitpath(stagepath,Path,"\\stage");
     getneogitpath(lcommitpath,Path,"\\lastcommit");
-    
+    crdir(stagepath);
     struct DIRs* dirs;
     opendirs(&dirs,Path,stagepath,lcommitpath,NULL);
     char*d_name;

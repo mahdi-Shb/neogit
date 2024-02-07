@@ -21,7 +21,7 @@ boolean hastheword(const char*s,const char*word){
 boolean search(int argc,const char **argv,char *msg){
     for (int j=0;j<argc;j++){
         // printf(argv[j]);
-        if (!strchr(argv[j],'*')){
+        if (!strchr(argv[j],WCCHR)){
             if (!hastheword(msg,argv[j])){
                 return false;
             }
@@ -36,7 +36,7 @@ boolean search(int argc,const char **argv,char *msg){
 }
 void printcommitdata(struct Commitdata* cd){
     printf("Time: %s",ctime(&cd->T));
-    printf("Message: %s\n",&cd->msg);
+    printf("Message: %s\n",cd->msg);
     printf("Username: %s\n",cd->username);
     printf("ID: %s\n",cd->id);
     printf("Branch: %s\n",cd->branch);

@@ -1,6 +1,8 @@
 #ifndef _COMMANDS_H_
 #define _COMMANDS_H_
-#define NUMBER_OF_COMMANDS 12
+#define NUMBER_OF_COMMANDS 14
+int Ctag(int argc,const char* argv[]);
+int Cgrep(int argc,const char* argv[]);
 int Crevert(int argc,const char* argv[]);
 int Cbranch(int argc,const char* argv[]);
 int Cadd(int argc,const char* argv[]);

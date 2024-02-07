@@ -16,6 +16,12 @@ int Cinit(int argc,const char* argv[]){
         printf("Failed to create directory for neogit\n");
         return 1;
     }
+    // Create the directory
+    BOOL result = CreateDirectoryA(".\\.neogit", NULL);
+        // Set the hidden attribute for the folder
+    DWORD attributes = GetFileAttributesA(".\\.neogit");
+    SetFileAttributesA(".\\.neogit", attributes | FILE_ATTRIBUTE_HIDDEN);
+
     boolean success=TRUE;
     //making files and dirs inside neogit:stage
     FILE* file;
@@ -26,6 +32,12 @@ int Cinit(int argc,const char* argv[]){
     success=success && !mkdir(".\\.neogit\\laststage");
     
     file=fopen(".\\.neogit\\shortcuts","w");
+    success=success && file;
+    if (file){
+        fclose(file);
+    }
+    
+    file=fopen(".\\.neogit\\tags","w");
     success=success && file;
     if (file){
         fclose(file);

@@ -9,8 +9,8 @@
 #include "commands.h"
 #include <stdlib.h>
 #include "constant.h"
-const char *COMMAND_NAMES[NUMBER_OF_COMMANDS]={"config","init","reset","status","commit","set","replace","remove","add","log","branch","revert"};
-int (*COMMAND_FUNCTIONS[NUMBER_OF_COMMANDS])(int argc,const char* argv[]) ={Cconfig,Cinit,Creset,Cstatus,Ccommit,Cset,Creplace,Cremove,Cadd,Clog,Cbranch,Crevert};
+const char *COMMAND_NAMES[NUMBER_OF_COMMANDS]={"config","init","reset","status","commit","set","replace","remove","add","log","branch","revert","tag","grep"};
+int (*COMMAND_FUNCTIONS[NUMBER_OF_COMMANDS])(int argc,const char* argv[]) ={Cconfig,Cinit,Creset,Cstatus,Ccommit,Cset,Creplace,Cremove,Cadd,Clog,Cbranch,Crevert,Ctag,Cgrep};
 char* neogitpath=NULL;
 int numberofcommits;
 void get_ID(char *ID){
@@ -78,7 +78,7 @@ boolean mwc(const char* name,char* tok,boolean starend){
         return *name=='\0' || starend ;
     }
     char* s=strstr(name,tok);
-    char *Tok=strtok(NULL,"*");
+    char *Tok=strtok(NULL,WCSTR);
     while (s){
         name=s+strlen(tok);
         if (mwc(name,Tok,starend)){
@@ -92,18 +92,18 @@ boolean match_wildcard(const char* WCName,const char* name){
     char wcname[200];
     strcpy(wcname,WCName);
     char* tok;
-    if (wcname[0]!='*'){
-        tok=strtok(wcname,"*");
+    if (wcname[0]!=WCCHR){
+        tok=strtok(wcname,WCSTR);
         if (strncmp(name,tok,strlen(tok))){
             return FALSE;
         } else {
             name+=strlen(tok);
-            tok=strtok(NULL,"*");
+            tok=strtok(NULL,WCSTR);
         }
     } else {
-        tok=strtok(wcname,"*");
+        tok=strtok(wcname,WCSTR);
     }
-    return mwc(name,tok,WCName[strlen(WCName)-1]=='*');
+    return mwc(name,tok,WCName[strlen(WCName)-1]==WCCHR);
 }
 char *get_file(char *path){
     for (char *result=path+strlen(path)-1; result>=path;result--){

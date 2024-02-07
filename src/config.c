@@ -36,8 +36,11 @@ int Cconfig(int argc,const char* argv[]){
             printf("Invalid Command\n");
             return 1;
         }
+        argc--;
+        argv++;
         // ...----------------------
-    } else if (argc==2){
+    }
+    if (argc==2){
         if (!strncmp(argv[0],"user.",5)){
             char config_path[_MAX_PATH];
             sprintf(config_path,"%s\\configs\\user",neogitpath);
@@ -66,6 +69,18 @@ int Cconfig(int argc,const char* argv[]){
             }
             fclose(config_file);
         } else if (!strncmp(argv[0],"alias.",6)){
+            boolean a=false;
+            char *gcmd= strtok(argv[1]," ");
+            gcmd= strtok(NULL," ");
+            for (int i=0; i<NUMBER_OF_COMMANDS;i++){
+                if (!strcmp(gcmd,COMMAND_NAMES[i])){
+                    a=true;
+                }
+            }
+            if (!a){
+                printf("invalid");
+                return 1;
+            }
             FILE* file = findalias(argv[0]+6);
             if (!file){
                 return 1;
@@ -75,6 +90,8 @@ int Cconfig(int argc,const char* argv[]){
             strcpy(alicmd.cmd,argv[1]);
             fwrite(&alicmd,sizeof(alicmd),1,file);
             fclose(file);
+            //printf("successfull");
+            
         } else {
             printf("Invalid config key\n");
             return 1;
@@ -83,5 +100,9 @@ int Cconfig(int argc,const char* argv[]){
         printf("Invalid Command");
         return 1;
     }
+    printf("successfully");    
+}
+
+int Ccheckout(int argc, char *argv[]){
     
 }
